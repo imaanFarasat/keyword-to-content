@@ -6,7 +6,18 @@ from datetime import datetime
 import time
 
 # Configure Gemini API
-GEMINI_API_KEY = "AIzaSyCnHLY38mv1nvmYV-2OXRacLXKjs5wItXQ"
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+if not GEMINI_API_KEY:
+    print("❌ Error: GEMINI_API_KEY environment variable not set")
+    print("Please set your Gemini API key in the .env file or as an environment variable")
+    exit(1)
+
 genai.configure(api_key=GEMINI_API_KEY)
 
 def setup_gemini():
@@ -44,7 +55,7 @@ Your tasks:
 2. **Meta Description**: Create an SEO-friendly meta description (150-160 characters) for "meta_description" field
 3. **Content**: Fill in all empty "paragraphs" arrays with 50-80 word paragraphs
 4. **Bullet Points**: Fill in all empty "bullets" arrays with 3-5 relevant bullet points
-5. **FAQs**: Create exactly 4 FAQs in the "faqs_html" array, each in HTML format with:
+5. **FAQs**: Create exactly 20 FAQs in the "faqs_html" array, each in HTML format with:
    - Question in <h2> tags
    - Answer in <p> tags
 
