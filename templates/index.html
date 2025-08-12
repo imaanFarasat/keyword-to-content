@@ -1,0 +1,1756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyword Hierarchy Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Neutral theme with high visibility */
+        :root {
+            --bg-primary: #f8f9fa;          /* Light grey background */
+            --bg-secondary: #ffffff;        /* Pure white secondary */
+            --bg-card: #ffffff;             /* White card background */
+            --text-primary: #000000;        /* Black text */
+            --text-secondary: #495057;      /* Dark grey text */
+            --text-muted: #6c757d;          /* Medium grey text */
+            --border-color: #dee2e6;        /* Light grey border */
+            --accent-warm: #dc3545;         /* Red accent */
+            --accent-cool: #0d6efd;         /* Blue accent */
+            --success-color: #198754;       /* Green for success */
+            --warning-color: #fd7e14;       /* Orange for warnings */
+            --danger-color: #dc3545;        /* Red for danger */
+            --h1-color: #dc3545;            /* Red for H1 */
+            --h2-color: #0d6efd;            /* Blue for H2 */
+            --h3-color: #198754;            /* Green for H3 */
+            --shadow-soft: rgba(0, 0, 0, 0.1);
+            --shadow-medium: rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            background: var(--bg-card);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 2px 8px var(--shadow-soft);
+        }
+
+        .upload-area:hover {
+            border-color: var(--accent-cool);
+            background-color: #f8f9ff;
+            box-shadow: 0 4px 12px var(--shadow-medium);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--accent-cool);
+            background-color: #e3f2fd;
+        }
+
+        .keyword-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            cursor: move;
+            box-shadow: 0 2px 6px var(--shadow-soft);
+        }
+
+        .keyword-card:hover {
+            box-shadow: 0 6px 12px var(--shadow-medium);
+            transform: translateY(-2px);
+            border-color: var(--accent-cool);
+        }
+
+        .keyword-card.dragging {
+            opacity: 0.7;
+            transform: rotate(2deg);
+        }
+
+        /* H1 Keywords - High contrast red */
+        .tag-h1 {
+            background: linear-gradient(135deg, var(--h1-color), #e74c3c);
+            color: #ffffff;
+            border: 3px solid var(--h1-color);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+            position: relative;
+        }
+
+        .tag-h1::before {
+            content: "🔥 H1";
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background: #000000;
+            color: var(--h1-color);
+            padding: 3px 10px;
+            border-radius: 8px;
+            font-size: 0.7em;
+            font-weight: 700;
+            z-index: 1;
+            border: 2px solid var(--h1-color);
+        }
+
+        .tag-h1 .keyword-text {
+            color: #ffffff !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-weight: 800;
+            font-size: 1.6em;
+        }
+
+        /* H2 Keywords - High contrast blue */
+        .tag-h2 {
+            background: linear-gradient(135deg, var(--h2-color), #0b5ed7);
+            color: #ffffff;
+            border: 3px solid var(--h2-color);
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+        }
+
+        .tag-h2 .keyword-text {
+            color: #ffffff !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+            font-size: 1.4em;
+        }
+
+        /* H3 Keywords - High contrast green */
+        .tag-h3 {
+            background: linear-gradient(135deg, var(--h3-color), #157347);
+            color: #ffffff;
+            border: 3px solid var(--h3-color);
+            box-shadow: 0 4px 12px rgba(25, 135, 84, 0.3);
+        }
+
+        .tag-h3 .keyword-text {
+            color: #ffffff !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+            font-size: 1.3em;
+        }
+
+        /* Untagged keywords - Black background */
+        .tag-untagged {
+            background: linear-gradient(135deg, #000000, #333333);
+            color: #ffffff;
+            border: 3px solid #000000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .tag-untagged::before {
+            content: "⚠️ UNTAGGED";
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background: #ffffff;
+            color: #000000;
+            padding: 3px 10px;
+            border-radius: 8px;
+            font-size: 0.7em;
+            font-weight: 700;
+            z-index: 1;
+            border: 2px solid #000000;
+        }
+
+        .tag-untagged .keyword-text {
+            color: #ffffff !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+            font-size: 1.4em;
+        }
+
+        .volume-badge {
+            font-size: 0.85em;
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.95) !important;
+            color: var(--text-primary) !important;
+            border: 2px solid var(--border-color);
+            font-weight: 600;
+        }
+
+        .controls-panel {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px var(--shadow-medium);
+            border: 2px solid var(--border-color);
+        }
+
+        .keywords-container {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 12px var(--shadow-medium);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-tag {
+            border: none;
+            border-radius: 10px;
+            padding: 8px 18px;
+            margin: 3px;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px var(--shadow-soft);
+        }
+
+        .btn-tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-medium);
+        }
+
+        .btn-outline-danger {
+            color: #ffffff;
+            border-color: var(--h1-color);
+            background: var(--h1-color);
+            border-width: 2px;
+            font-weight: 700;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-outline-danger:hover {
+            color: #ffffff;
+            background: #e74c3c;
+            border-color: #e74c3c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+        }
+
+        .btn-outline-success {
+            color: #ffffff;
+            border-color: var(--h2-color);
+            background: var(--h2-color);
+            border-width: 2px;
+            font-weight: 700;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-outline-success:hover {
+            color: #ffffff;
+            background: #0b5ed7;
+            border-color: #0b5ed7;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
+        }
+
+        .btn-outline-info {
+            color: #ffffff;
+            border-color: var(--h3-color);
+            background: var(--h3-color);
+            border-width: 2px;
+            font-weight: 700;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-outline-info:hover {
+            color: #ffffff;
+            background: #157347;
+            border-color: #157347;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(25, 135, 84, 0.4);
+        }
+
+        .btn-remove {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-remove:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.5);
+        }
+
+        .drag-handle {
+            cursor: move;
+            color: var(--text-muted);
+            margin-right: 12px;
+            font-size: 16px;
+        }
+
+        .keyword-text {
+            font-weight: 600;
+            transition: all 0.3s ease;
+            line-height: 1.3;
+        }
+
+        .keyword-text:hover {
+            text-decoration: none;
+        }
+
+        .keyword-text.selected {
+            background: #333333 !important;
+            color: #ffffff !important;
+            padding: 8px 12px !important;
+            border-radius: 10px !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+            border: 3px solid #ffffff !important;
+            font-weight: 800 !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+            position: relative !important;
+        }
+
+        /* Specific styling for selected H3 keywords to ensure visibility */
+        .tag-h3 .keyword-text.selected {
+            background: #000000 !important;
+            color: #ffffff !important;
+            border: 3px solid var(--h3-color) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
+        }
+
+        .tag-h3 .keyword-text.selected:hover {
+            background: #333333 !important;
+            color: #ffffff !important;
+            transform: scale(1.02) !important;
+        }
+
+        .keyword-text.selected::before {
+            content: "✓ SELECTED";
+            position: absolute;
+            top: -15px;
+            left: 10px;
+            background: #ffffff;
+            color: #333333;
+            padding: 3px 10px;
+            border-radius: 8px;
+            font-size: 0.6em;
+            font-weight: 700;
+            z-index: 1;
+            border: 2px solid #333333;
+        }
+
+        /* Specific badge for selected H3 keywords */
+        .tag-h3 .keyword-text.selected::before {
+            content: "✓ SELECTED H3";
+            background: #000000;
+            color: var(--h3-color);
+            border: 2px solid var(--h3-color);
+        }
+
+        .keyword-text.selected:hover {
+            background: #444444 !important;
+            color: #ffffff !important;
+            text-decoration: none !important;
+            transform: scale(1.02) !important;
+        }
+
+        .keyword-text.editing {
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-cool);
+            border-radius: 8px;
+            padding: 6px 12px;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2);
+            color: var(--text-primary);
+        }
+
+        .edit-input {
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-cool);
+            border-radius: 8px;
+            padding: 6px 12px;
+            outline: none;
+            font-size: inherit;
+            font-weight: inherit;
+            width: 100%;
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2);
+            color: var(--text-primary);
+        }
+
+        .edit-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .edit-btn {
+            padding: 4px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .save-btn:hover {
+            background: #157347;
+        }
+
+        .cancel-btn {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .cancel-btn:hover {
+            background: #c82333;
+        }
+
+        .intent-badge {
+            font-size: 0.75em;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .keyword-checkbox {
+            border: 2px solid var(--text-secondary) !important;
+            border-radius: 4px !important;
+            width: 20px !important;
+            height: 20px !important;
+        }
+
+        .keyword-checkbox:checked {
+            background-color: var(--accent-cool) !important;
+            border-color: var(--accent-cool) !important;
+        }
+
+        .form-check {
+            margin-right: 18px !important;
+        }
+
+        .h3-container {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            margin-top: 12px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+            padding: 16px;
+        }
+
+        .h3-container .keyword-card {
+            margin-bottom: 10px;
+            border-left: 4px solid var(--accent-cool);
+            background: var(--bg-card);
+        }
+
+        .h3-container .keyword-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .search-results-list {
+            max-height: 350px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-primary);
+        }
+
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-card);
+            transition: all 0.3s ease;
+        }
+
+        .search-result-item:hover {
+            background: #f8f9ff;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-info {
+            flex-grow: 1;
+        }
+
+        .search-result-keyword {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            font-size: 1.1em;
+        }
+
+        .search-result-details {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .search-result-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .search-result-tag {
+            font-size: 0.8em;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .search-result-tag.h1 {
+            background: var(--h1-color);
+            color: #ffffff;
+            border: 2px solid #000000;
+        }
+
+        .search-result-tag.h2 {
+            background: var(--h2-color);
+            color: #ffffff;
+            border: 2px solid #000000;
+        }
+
+        .search-result-tag.h3 {
+            background: var(--h3-color);
+            color: #ffffff;
+            border: 2px solid #000000;
+        }
+
+        .search-result-tag.untagged {
+            background: #6c757d;
+            color: #ffffff;
+            border: 2px solid #000000;
+        }
+
+        .keyword-card.tag-h2.drag-over {
+            border: 2px dashed var(--h2-color) !important;
+            background-color: rgba(13, 110, 253, 0.1) !important;
+            transform: scale(1.02) !important;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 16px var(--shadow-medium) !important;
+        }
+
+        .keyword-card.tag-h3 {
+            cursor: grab;
+            transition: all 0.3s ease;
+        }
+
+        .keyword-card.tag-h3:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px var(--shadow-medium);
+        }
+
+        .keyword-card.tag-h3:active {
+            cursor: grabbing;
+            transform: scale(0.98);
+        }
+
+        .keyword-card.tag-h3.dragging {
+            opacity: 0.8;
+            transform: rotate(2deg) scale(1.05);
+            box-shadow: 0 8px 16px var(--shadow-medium);
+        }
+
+        .keyword-card.tag-h2 {
+            position: relative;
+        }
+
+        .keyword-card.tag-h2::after {
+            content: "Drop H3 here";
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--h2-color);
+            color: #ffffff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.8em;
+            font-weight: 700;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            box-shadow: 0 4px 12px var(--shadow-medium);
+            border: 2px solid #000000;
+        }
+
+        .keyword-card.tag-h2.drag-over::after {
+            opacity: 1;
+        }
+
+        /* Additional neutral theme improvements */
+        .display-4 {
+            color: var(--text-primary) !important;
+            font-weight: 700;
+        }
+
+        .text-primary {
+            color: var(--accent-cool) !important;
+        }
+
+        .text-muted {
+            color: var(--text-muted) !important;
+        }
+
+        .text-dark {
+            color: var(--text-primary) !important;
+        }
+
+        .form-control {
+            border-color: var(--border-color);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-cool);
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-cool);
+            border-color: var(--accent-cool);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0b5ed7;
+            color: #ffffff;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .btn-success:hover {
+            background-color: #157347;
+            border-color: #157347;
+            color: #ffffff;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            border-color: var(--warning-color);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .btn-warning:hover {
+            background-color: #e55a2b;
+            border-color: #e55a2b;
+            color: #ffffff;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #c82333;
+            color: #ffffff;
+        }
+
+        .btn-secondary {
+            background-color: var(--text-secondary);
+            border-color: var(--text-secondary);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #5a6268;
+            color: #ffffff;
+        }
+
+        .badge {
+            font-size: 0.85em;
+            padding: 6px 10px;
+        }
+
+        .badge.bg-primary {
+            background-color: var(--accent-cool) !important;
+            color: #ffffff !important;
+        }
+
+        .badge.bg-secondary {
+            background-color: var(--text-secondary) !important;
+            color: #ffffff !important;
+        }
+
+        /* Scrollbar styling for neutral theme */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--text-muted);
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* Focus indicators for accessibility */
+        .btn:focus,
+        .form-control:focus,
+        .keyword-text:focus {
+            outline: 2px solid var(--accent-cool);
+            outline-offset: 2px;
+        }
+
+        /* Reduce motion for users who prefer it */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="text-center mb-4">
+            <h1 class="display-4 text-primary">
+                <i class="fas fa-key"></i> Keyword Hierarchy Dashboard
+            </h1>
+            <p class="lead text-muted">Upload your SEMrush CSV and organize keywords into H1, H2, H3 structure</p>
+            <button class="btn btn-secondary" onclick="testConnection()">Test Connection</button>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+            <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+            <h4>Upload SEMrush CSV File</h4>
+            <p class="text-muted">Click to browse or drag and drop your CSV file here</p>
+            <input type="file" id="fileInput" accept=".csv" style="display: none;">
+        </div>
+
+        <!-- Controls Panel -->
+        <div class="controls-panel" id="controlsPanel" style="display: none;">
+            <div class="row align-items-center justify-content-between">
+                <div class="col-md-2">
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="volumeFilter" value="400" min="0" placeholder="Volume">
+                        <button class="btn btn-dark" onclick="filterKeywords()">
+                            <i class="fas fa-filter"></i> Filter
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="d-flex gap-3">
+                        <button class="btn btn-dark" onclick="downloadStructuredJSON()">
+                            <i class="fas fa-download"></i> Download JSON
+                        </button>
+                        <button class="btn btn-primary" onclick="generateContent()" id="generateBtn">
+                            <i class="fas fa-magic"></i> Generate Content
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4 ms-4">
+                    <div class="d-flex gap-3 align-items-center">
+                        <div class="form-check me-4">
+                            <input class="form-check-input" type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()">
+                            <label class="form-check-label" for="selectAllCheckbox">
+                                <strong>Select All</strong>
+                            </label>
+                        </div>
+                        <button class="btn btn-dark" onclick="addNewH2()">
+                            <i class="fas fa-plus"></i> Add H2
+                        </button>
+                        <button class="btn btn-danger" onclick="removeSelectedH2s()" id="removeH2Btn" style="display: none;">
+                            <i class="fas fa-trash"></i> Remove Selected
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="d-flex justify-content-end align-items-center">
+                        <span class="badge bg-dark" id="keywordCount">0 keywords</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Keywords Container -->
+        <div class="keywords-container" id="keywordsContainer" style="display: none;">
+            <h4 class="mb-3">
+                <i class="fas fa-list"></i> Keywords
+                <small class="text-muted">(Drag to reorder, click tags to assign)</small>
+            </h4>
+            
+            <!-- Search Section -->
+            <div class="search-section mb-4">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" class="form-control" id="keywordSearch" placeholder="Search keywords..." oninput="searchKeywords()">
+                    <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
+                </div>
+                <div id="searchResults" class="mt-3" style="display: none;">
+                    <h6 class="text-muted mb-2">
+                        <i class="fas fa-search"></i> Search Results
+                        <span id="searchCount" class="badge bg-primary ms-2">0</span>
+                    </h6>
+                    <div id="searchResultsList" class="search-results-list"></div>
+                </div>
+            </div>
+            
+            <div id="keywordsList"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentData = [];
+        let filteredData = [];
+
+        // File upload handling
+        const fileInput = document.getElementById('fileInput');
+        console.log('File input element:', fileInput); // Debug log
+        
+        fileInput.addEventListener('change', (event) => {
+            console.log('File input change event triggered'); // Debug log
+            handleFileUpload(event);
+        });
+        
+        // Drag and drop
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        function handleFileUpload(event) {
+            console.log('handleFileUpload called'); // Debug log
+            console.log('Event target files:', event.target.files); // Debug log
+            const file = event.target.files[0];
+            if (file) {
+                console.log('File selected:', file.name, file.type); // Debug log
+                handleFile(file);
+            } else {
+                console.log('No file selected'); // Debug log
+            }
+        }
+
+        function handleFile(file) {
+            console.log('handleFile called with:', file.name); // Debug log
+            const formData = new FormData();
+            formData.append('file', file);
+
+            console.log('Sending request to /upload'); // Debug log
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                console.log('Response status:', response.status); // Debug log
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data); // Debug log
+                if (data.success) {
+                    currentData = data.data;
+                    filteredData = currentData.filter(kw => kw.volume >= 400);
+                    showControls();
+                    renderKeywords();
+                    showNotification(data.message, 'success');
+                } else {
+                    showNotification(data.error, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error); // Debug log
+                showNotification('Error uploading file: ' + error.message, 'error');
+            });
+        }
+
+        function filterKeywords() {
+            const minVolume = parseInt(document.getElementById('volumeFilter').value);
+            
+            fetch('/filter', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ min_volume: minVolume })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    filteredData = data.data;
+                    renderKeywords();
+                    showNotification(`Filtered to ${data.count} keywords. Working with filtered data only.`, 'success');
+                } else {
+                    showNotification(data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showNotification('Error filtering keywords: ' + error.message, 'error');
+            });
+        }
+
+        function assignTag(keywordId, tag) {
+            fetch('/update_tags', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    updates: [{ id: keywordId, tag: tag }]
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update local data
+                    const keyword = filteredData.find(kw => kw.id === keywordId);
+                    if (keyword) {
+                        keyword.tag = tag;
+                        
+                        // If assigning H3 tag, automatically assign parent H2
+                        if (tag === 'H3') {
+                            assignParentH2(keywordId);
+                        }
+                    }
+                    renderKeywords();
+                    showNotification('Tag updated successfully', 'success');
+                } else {
+                    showNotification(data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showNotification('Error updating tag: ' + error.message, 'error');
+            });
+        }
+        
+        function assignParentH2(h3KeywordId) {
+            // Find the H2 keyword that comes before this H3 keyword
+            const h3Keyword = filteredData.find(kw => kw.id === h3KeywordId);
+            if (!h3Keyword) return;
+            
+            const h3Order = h3Keyword.order;
+            const h2Keywords = filteredData.filter(kw => kw.tag === 'H2').sort((a, b) => b.order - a.order); // Sort descending
+            
+            // Find the closest H2 that comes before this H3
+            for (const h2Kw of h2Keywords) {
+                if (h2Kw.order < h3Order) {
+                    // Assign this H2 as parent
+                    h3Keyword.parent_id = h2Kw.id;
+                    break;
+                }
+            }
+        }
+
+        function removeKeyword(keywordId) {
+            // Remove without confirmation
+            fetch('/remove_keyword', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id: keywordId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove from filtered data (this is what we're working with)
+                    filteredData = filteredData.filter(kw => kw.id !== keywordId);
+                    
+                    // Update order
+                    for (let i = 0; i < filteredData.length; i++) {
+                        filteredData[i].order = i;
+                    }
+                    
+                    // Update backend with the new data and wait for completion
+                    updateBackendData().then(() => {
+                        renderKeywords();
+                        showNotification('Keyword removed successfully', 'success');
+                    }).catch(error => {
+                        console.error('Error updating backend data:', error);
+                        showNotification('Error updating data. Please try again.', 'error');
+                    });
+                } else {
+                    showNotification(data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showNotification('Error removing keyword: ' + error.message, 'error');
+            });
+        }
+
+
+        function downloadStructuredJSON() {
+            console.log('Downloading data - filteredData length:', filteredData.length);
+            console.log('Downloading data - filteredData:', filteredData);
+            
+            // Use filteredData for download (only the currently visible/filtered keywords)
+            const dataToDownload = filteredData;
+            
+            // First, ensure backend is synced with the data we want to download
+            updateBackendData().then(() => {
+                // Then download with a small delay to ensure backend has processed the update
+                setTimeout(() => {
+                    fetch('/download', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ data: dataToDownload })
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.blob();
+                        }
+                        throw new Error('Download failed');
+                    })
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'keyword_hierarchy.json';
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+                        showNotification('Structured JSON file downloaded successfully', 'success');
+                    })
+                    .catch(error => {
+                        showNotification('Error downloading file: ' + error.message, 'error');
+                    });
+                }, 200); // 200ms delay after backend sync
+            }).catch(error => {
+                console.error('Error syncing with backend before download:', error);
+                showNotification('Error syncing data before download. Please try again.', 'error');
+            });
+        }
+
+
+
+        function renderKeywords() {
+            const container = document.getElementById('keywordsList');
+            const keywordCount = document.getElementById('keywordCount');
+            
+            keywordCount.textContent = `${filteredData.length} keywords`;
+            
+            container.innerHTML = '';
+            
+            // Group keywords by tag
+            const h1Keywords = filteredData.filter(kw => kw.tag === 'H1');
+            const h2Keywords = filteredData.filter(kw => kw.tag === 'H2');
+            const h3Keywords = filteredData.filter(kw => kw.tag === 'H3');
+            const untaggedKeywords = filteredData.filter(kw => !kw.tag);
+            
+            // Render H1 keywords
+            if (h1Keywords.length > 0) {
+                const h1Section = document.createElement('div');
+                h1Section.className = 'mb-4';
+                h1Section.innerHTML = '<h5 class="text-dark mb-3"><i class="fas fa-heading"></i> H1 Keywords</h5>';
+                h1Keywords.forEach(keyword => {
+                    h1Section.appendChild(createKeywordCard(keyword));
+                });
+                container.appendChild(h1Section);
+            }
+            
+            // Render H2 keywords with their related H3 keywords
+            if (h2Keywords.length > 0) {
+                const h2Section = document.createElement('div');
+                h2Section.className = 'mb-4';
+                h2Section.innerHTML = '<h5 class="text-dark mb-3"><i class="fas fa-heading"></i> H2 Keywords</h5>';
+                
+                // Sort keywords by order
+                h2Keywords.sort((a, b) => a.order - b.order);
+                h3Keywords.sort((a, b) => a.order - b.order);
+                
+                h2Keywords.forEach(h2Keyword => {
+                    // Create H2 card
+                    const h2Card = createKeywordCard(h2Keyword, true);
+                    
+                    // Find H3 keywords that belong to this H2 using parent_id
+                    const relatedH3Keywords = h3Keywords.filter(h3Kw => 
+                        h3Kw.parent_id === h2Keyword.id
+                    );
+                    
+                    // If there are related H3 keywords, create a container for them
+                    if (relatedH3Keywords.length > 0) {
+                        const h3Container = document.createElement('div');
+                        h3Container.className = 'h3-container ms-4 mt-2';
+                        h3Container.style.borderLeft = '3px solid #45b7d1';
+                        h3Container.style.paddingLeft = '15px';
+                        
+                        // Add a small header to show this is H3 keywords
+                        const h3Header = document.createElement('div');
+                        h3Header.className = 'text-dark mb-2';
+                        h3Header.style.fontSize = '0.9em';
+                        h3Header.style.fontWeight = '500';
+                        h3Header.innerHTML = `<i class="fas fa-level-down-alt"></i> Related H3 Keywords (${relatedH3Keywords.length})`;
+                        h3Container.appendChild(h3Header);
+                        
+                        relatedH3Keywords.forEach(h3Keyword => {
+                            const h3Card = createKeywordCard(h3Keyword, false);
+                            h3Container.appendChild(h3Card);
+                        });
+                        
+                        // Append H3 container to H2 card
+                        h2Card.appendChild(h3Container);
+                    }
+                    
+                    h2Section.appendChild(h2Card);
+                });
+                
+                container.appendChild(h2Section);
+            }
+            
+            // Render remaining H3 keywords (those that don't belong to any H2)
+            const remainingH3Keywords = h3Keywords.filter(h3Kw => !h3Kw.parent_id);
+            
+            if (remainingH3Keywords.length > 0) {
+                const h3Section = document.createElement('div');
+                h3Section.className = 'mb-4';
+                h3Section.innerHTML = '<h5 class="text-dark mb-3"><i class="fas fa-heading"></i> H3 Keywords (Unassigned)</h5>';
+                remainingH3Keywords.forEach(keyword => {
+                    h3Section.appendChild(createKeywordCard(keyword));
+                });
+                container.appendChild(h3Section);
+            }
+            
+            // Render untagged keywords
+            if (untaggedKeywords.length > 0) {
+                const untaggedSection = document.createElement('div');
+                untaggedSection.className = 'mb-4';
+                untaggedSection.innerHTML = '<h5 class="text-dark mb-3"><i class="fas fa-tags"></i> Untagged Keywords</h5>';
+                untaggedKeywords.forEach(keyword => {
+                    untaggedSection.appendChild(createKeywordCard(keyword));
+                });
+                container.appendChild(untaggedSection);
+            }
+            
+            setupDragAndDrop();
+            updateRemoveButton();
+        }
+        
+        function createKeywordCard(keyword, isH2 = false) {
+            const card = document.createElement('div');
+            card.className = `keyword-card ${keyword.tag ? 'tag-' + keyword.tag.toLowerCase() : 'tag-untagged'}`;
+            card.draggable = true;
+            card.dataset.id = keyword.id;
+            
+            const checkbox = `
+                <div class="form-check me-3">
+                    <input class="form-check-input keyword-checkbox" type="checkbox" value="${keyword.id}" 
+                           onchange="updateRemoveButton()" style="width: 18px; height: 18px; cursor: pointer;">
+                    <label class="form-check-label" for="checkbox-${keyword.id}" style="cursor: pointer;"></label>
+                </div>
+            `;
+            
+            const keywordText = `<div class="keyword-text" onclick="editKeyword(${keyword.id})" style="cursor: pointer;">${keyword.keyword}</div>`;
+            
+            card.innerHTML = `
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center flex-grow-1">
+                        ${checkbox}
+                        <i class="fas fa-grip-vertical drag-handle me-2"></i>
+                        <div class="flex-grow-1">
+                            ${keywordText}
+                            <div class="mt-1">
+                                <span class="badge bg-secondary volume-badge">
+                                    <i class="fas fa-chart-line"></i> ${keyword.volume.toLocaleString()}
+                                </span>
+                                ${keyword.intent ? `<span class="intent-badge ms-2">${keyword.intent}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn-tag ${keyword.tag === 'H1' ? 'tag-h1' : 'btn-outline-danger'}" 
+                                    onclick="assignTag(${keyword.id}, 'H1')">H1</button>
+                            <button type="button" class="btn-tag ${keyword.tag === 'H2' ? 'tag-h2' : 'btn-outline-success'}" 
+                                    onclick="assignTag(${keyword.id}, 'H2')">H2</button>
+                            <button type="button" class="btn-tag ${keyword.tag === 'H3' ? 'tag-h3' : 'btn-outline-info'}" 
+                                    onclick="assignTag(${keyword.id}, 'H3')">H3</button>
+                        </div>
+                        <button class="btn-remove" onclick="removeKeyword(${keyword.id})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function setupDragAndDrop() {
+            const cards = document.querySelectorAll('.keyword-card');
+            
+            cards.forEach(card => {
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragend', handleDragEnd);
+                card.addEventListener('dragover', handleDragOver);
+                card.addEventListener('drop', handleDrop);
+            });
+            
+            // Add drop zones for H2 keywords to accept H3 drops
+            const h2Cards = document.querySelectorAll('.keyword-card.tag-h2');
+            h2Cards.forEach(h2Card => {
+                h2Card.addEventListener('dragover', handleH2DragOver);
+                h2Card.addEventListener('drop', handleH2Drop);
+            });
+        }
+
+        function handleDragStart(e) {
+            e.target.classList.add('dragging');
+            e.dataTransfer.setData('text/plain', e.target.dataset.id);
+            
+            // Add visual feedback for H3 keywords being dragged
+            const keywordId = parseInt(e.target.dataset.id);
+            const keyword = filteredData.find(kw => kw.id === keywordId);
+            if (keyword && keyword.tag === 'H3') {
+                e.target.classList.add('dragging');
+                // Show drop zones for H2 keywords
+                const h2Cards = document.querySelectorAll('.keyword-card.tag-h2');
+                h2Cards.forEach(card => {
+                    card.style.border = '2px dashed #333333';
+                    card.style.backgroundColor = 'rgba(51, 51, 51, 0.1)';
+                });
+            }
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            
+            // Reset any H2 cards that might have been highlighted
+            const h2Cards = document.querySelectorAll('.keyword-card.tag-h2');
+            h2Cards.forEach(card => {
+                card.style.border = '';
+                card.style.backgroundColor = '';
+                card.classList.remove('drag-over');
+            });
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const draggedId = parseInt(e.dataTransfer.getData('text/plain'));
+            const targetId = parseInt(e.target.closest('.keyword-card').dataset.id);
+            
+            if (draggedId !== targetId) {
+                reorderKeywords(draggedId, targetId);
+            }
+        }
+        
+        function handleH2DragOver(e) {
+            e.preventDefault();
+            const draggedId = parseInt(e.dataTransfer.getData('text/plain'));
+            const draggedKeyword = filteredData.find(kw => kw.id === draggedId);
+            
+            // Only allow H3 keywords to be dropped on H2 keywords
+            if (draggedKeyword && draggedKeyword.tag === 'H3') {
+                const h2Card = e.target.closest('.keyword-card');
+                h2Card.classList.add('drag-over');
+            }
+        }
+        
+        function handleH2Drop(e) {
+            e.preventDefault();
+            const draggedId = parseInt(e.dataTransfer.getData('text/plain'));
+            const targetId = parseInt(e.target.closest('.keyword-card').dataset.id);
+            
+            const draggedKeyword = filteredData.find(kw => kw.id === draggedId);
+            const targetKeyword = filteredData.find(kw => kw.id === targetId);
+            
+            // Reset styling
+            const h2Card = e.target.closest('.keyword-card');
+            h2Card.classList.remove('drag-over');
+            
+            // Only allow H3 keywords to be dropped on H2 keywords
+            if (draggedKeyword && draggedKeyword.tag === 'H3' && targetKeyword && targetKeyword.tag === 'H2') {
+                // Assign the H3 keyword to the H2 keyword
+                draggedKeyword.parent_id = targetKeyword.id;
+                
+                // Update backend
+                updateBackendData().then(() => {
+                    renderKeywords();
+                    showNotification(`"${draggedKeyword.keyword}" assigned to "${targetKeyword.keyword}"`, 'success');
+                }).catch(error => {
+                    console.error('Error updating backend data:', error);
+                    showNotification('Error assigning keyword. Please try again.', 'error');
+                });
+            }
+        }
+
+        function reorderKeywords(draggedId, targetId) {
+            const draggedIndex = filteredData.findIndex(kw => kw.id === draggedId);
+            const targetIndex = filteredData.findIndex(kw => kw.id === targetId);
+            
+            if (draggedIndex !== -1 && targetIndex !== -1) {
+                const [draggedItem] = filteredData.splice(draggedIndex, 1);
+                filteredData.splice(targetIndex, 0, draggedItem);
+                
+                // Update order in backend
+                const newOrder = filteredData.map(kw => kw.id);
+                
+                fetch('/reorder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ order: newOrder })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        renderKeywords();
+                        showNotification('Keywords reordered successfully', 'success');
+                    } else {
+                        showNotification(data.error, 'error');
+                    }
+                })
+                .catch(error => {
+                    showNotification('Error reordering keywords: ' + error.message, 'error');
+                });
+            }
+        }
+
+        function showControls() {
+            document.getElementById('controlsPanel').style.display = 'block';
+            document.getElementById('keywordsContainer').style.display = 'block';
+        }
+
+        function testConnection() {
+            console.log('Testing connection...'); // Debug log
+            fetch('/test')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Test response:', data); // Debug log
+                    showNotification('Connection test successful!', 'success');
+                })
+                .catch(error => {
+                    console.error('Test error:', error); // Debug log
+                    showNotification('Connection test failed: ' + error.message, 'error');
+                });
+        }
+
+        function updateRemoveButton() {
+            const checkedBoxes = document.querySelectorAll('.keyword-checkbox:checked');
+            const removeBtn = document.getElementById('removeH2Btn');
+            
+            if (checkedBoxes.length > 0) {
+                removeBtn.style.display = 'inline-block';
+                removeBtn.innerHTML = `<i class="fas fa-trash"></i> Remove Selected (${checkedBoxes.length})`;
+            } else {
+                removeBtn.style.display = 'none';
+            }
+        }
+        
+        function removeSelectedH2s() {
+            const checkedBoxes = document.querySelectorAll('.keyword-checkbox:checked');
+            const selectedIds = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
+            
+            if (selectedIds.length === 0) return;
+            
+            console.log('Removing keywords with IDs:', selectedIds);
+            console.log('Before removal - filteredData length:', filteredData.length);
+            
+            // Get the keywords that will be removed for debugging
+            const keywordsToRemove = filteredData.filter(kw => selectedIds.includes(kw.id));
+            console.log('Keywords to remove:', keywordsToRemove.map(kw => ({ id: kw.id, keyword: kw.keyword, tag: kw.tag })));
+            
+            // Remove from filtered data (this is what we're working with)
+            filteredData = filteredData.filter(kw => !selectedIds.includes(kw.id));
+            
+            console.log('After removal - filteredData length:', filteredData.length);
+            console.log('Remaining keywords:', filteredData.map(kw => ({ id: kw.id, keyword: kw.keyword, tag: kw.tag })));
+            
+            // Update order
+            for (let i = 0; i < filteredData.length; i++) {
+                filteredData[i].order = i;
+            }
+            
+            // Update backend with the new data and wait for completion
+            updateBackendData().then(() => {
+                renderKeywords();
+                showNotification(`Removed ${selectedIds.length} keywords`, 'success');
+            }).catch(error => {
+                console.error('Error updating backend data:', error);
+                showNotification('Error updating data. Please try again.', 'error');
+            });
+        }
+        
+        function updateBackendData() {
+            // Send updated data to backend (use filteredData since that's what we're working with)
+            return fetch('/update_data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ data: filteredData })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    console.error('Failed to update backend data');
+                    throw new Error('Failed to update backend data');
+                }
+                return data;
+            })
+            .catch(error => {
+                console.error('Error updating backend data:', error);
+                throw error;
+            });
+        }
+        
+        function editKeyword(keywordId) {
+            const keyword = filteredData.find(kw => kw.id === keywordId);
+            if (!keyword) return;
+            
+            // Find the keyword text element
+            const keywordElement = document.querySelector(`[data-id="${keywordId}"] .keyword-text`);
+            if (!keywordElement) return;
+            
+            const originalText = keyword.keyword;
+            
+            // Create input field
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'edit-input';
+            input.value = originalText;
+            
+            // Create buttons container
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.className = 'edit-buttons';
+            
+            const saveBtn = document.createElement('button');
+            saveBtn.className = 'edit-btn save-btn';
+            saveBtn.innerHTML = '<i class="fas fa-check"></i> Save';
+            
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'edit-btn cancel-btn';
+            cancelBtn.innerHTML = '<i class="fas fa-times"></i> Cancel';
+            
+            buttonsContainer.appendChild(saveBtn);
+            buttonsContainer.appendChild(cancelBtn);
+            
+            // Replace text with input
+            keywordElement.innerHTML = '';
+            keywordElement.appendChild(input);
+            keywordElement.appendChild(buttonsContainer);
+            keywordElement.classList.add('editing');
+            
+            // Focus and select all text
+            input.focus();
+            input.select();
+            
+            // Save function
+            const saveEdit = () => {
+                let newValue = input.value.trim();
+                if (newValue && newValue !== originalText) {
+                    // Capitalize first letter of each word for H1 and H2
+                    if (keyword.tag === 'H1' || keyword.tag === 'H2') {
+                        newValue = newValue.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+                    }
+                    
+                    keyword.keyword = newValue;
+                    renderKeywords();
+                    showNotification('Keyword updated', 'success');
+                } else {
+                    // Restore original if empty or unchanged
+                    keywordElement.innerHTML = originalText;
+                    keywordElement.classList.remove('editing');
+                }
+            };
+            
+            // Cancel function
+            const cancelEdit = () => {
+                keywordElement.innerHTML = originalText;
+                keywordElement.classList.remove('editing');
+            };
+            
+            // Event listeners
+            saveBtn.addEventListener('click', saveEdit);
+            cancelBtn.addEventListener('click', cancelEdit);
+            
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    saveEdit();
+                } else if (e.key === 'Escape') {
+                    cancelEdit();
+                }
+            });
+            
+            // Click outside to cancel
+            const handleClickOutside = (e) => {
+                if (!keywordElement.contains(e.target)) {
+                    cancelEdit();
+                    document.removeEventListener('click', handleClickOutside);
+                }
+            };
+            
+            // Delay to prevent immediate trigger
+            setTimeout(() => {
+                document.addEventListener('click', handleClickOutside);
+            }, 100);
+        }
+        
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const allCheckboxes = document.querySelectorAll('.keyword-checkbox');
+            
+            allCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+            
+            updateRemoveButton();
+        }
+        
+        function addNewH2() {
+            const newKeyword = prompt('Enter new H2 keyword:');
+            if (newKeyword && newKeyword.trim() !== '') {
+                // Capitalize first letter of each word for H2
+                let capitalizedKeyword = newKeyword.trim().toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+                
+                const newId = Math.max(...filteredData.map(kw => kw.id), 0) + 1;
+                const newH2 = {
+                    id: newId,
+                    keyword: capitalizedKeyword,
+                    volume: 0,
+                    intent: '',
+                    difficulty: 0,
+                    cpc: 0,
+                    tag: 'H2',
+                    order: filteredData.length
+                };
+                
+                filteredData.push(newH2);
+                
+                renderKeywords();
+                showNotification('New H2 keyword added', 'success');
+            }
+        }
+        
+
+
+        function searchKeywords() {
+            const searchTerm = document.getElementById('keywordSearch').value.toLowerCase().trim();
+            const searchResults = document.getElementById('searchResults');
+            const searchResultsList = document.getElementById('searchResultsList');
+            const searchCount = document.getElementById('searchCount');
+            
+            if (searchTerm === '') {
+                searchResults.style.display = 'none';
+                return;
+            }
+            
+            // Search in filteredData
+            const results = filteredData.filter(keyword => 
+                keyword.keyword.toLowerCase().includes(searchTerm)
+            );
+            
+            // Display results
+            searchResultsList.innerHTML = '';
+            
+            if (results.length === 0) {
+                searchResultsList.innerHTML = '<div class="p-3 text-center text-muted">No keywords found matching your search.</div>';
+            } else {
+                results.forEach(keyword => {
+                    const resultItem = createSearchResultItem(keyword);
+                    searchResultsList.appendChild(resultItem);
+                });
+            }
+            
+            searchCount.textContent = results.length;
+            searchResults.style.display = 'block';
+        }
+        
+        function createSearchResultItem(keyword) {
+            const item = document.createElement('div');
+            item.className = 'search-result-item';
+            
+            const tagClass = keyword.tag ? keyword.tag.toLowerCase() : 'untagged';
+            const tagText = keyword.tag || 'Untagged';
+            
+            item.innerHTML = `
+                <div class="search-result-info">
+                    <div class="search-result-keyword">${keyword.keyword}</div>
+                    <div class="search-result-details">
+                        Volume: ${keyword.volume.toLocaleString()} | 
+                        Difficulty: ${keyword.difficulty} | 
+                        CPC: $${keyword.cpc} | 
+                        Intent: ${keyword.intent || 'N/A'}
+                    </div>
+                </div>
+                <div class="search-result-actions">
+                    <span class="search-result-tag ${tagClass}">${tagText}</span>
+                    <button class="btn btn-sm btn-outline-danger" onclick="removeKeywordFromSearch(${keyword.id})" title="Remove keyword">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            
+            return item;
+        }
+        
+        function removeKeywordFromSearch(keywordId) {
+            // Remove from filteredData
+            filteredData = filteredData.filter(kw => kw.id !== keywordId);
+            
+            // Update order
+            for (let i = 0; i < filteredData.length; i++) {
+                filteredData[i].order = i;
+            }
+            
+            // Update backend
+            updateBackendData().then(() => {
+                // Refresh search results
+                searchKeywords();
+                // Refresh main keyword list
+                renderKeywords();
+                showNotification('Keyword removed successfully', 'success');
+            }).catch(error => {
+                console.error('Error updating backend data:', error);
+                showNotification('Error removing keyword. Please try again.', 'error');
+            });
+        }
+        
+        function clearSearch() {
+            document.getElementById('keywordSearch').value = '';
+            document.getElementById('searchResults').style.display = 'none';
+        }
+        
+        function generateContent() {
+            const generateBtn = document.getElementById('generateBtn');
+            const originalText = generateBtn.innerHTML;
+            
+            // Show loading state
+            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            generateBtn.disabled = true;
+            
+            console.log('Generating content for filteredData length:', filteredData.length);
+            
+            // First, ensure backend is synced with the data we want to generate content for
+            updateBackendData().then(() => {
+                // Then generate content with a small delay to ensure backend has processed the update
+                setTimeout(() => {
+                    fetch('/generate_content', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ data: filteredData })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showNotification(`Content generated successfully! File: ${data.filename}`, 'success');
+                            
+                            // Show summary in console
+                            console.log('Generated Content Summary:', data.summary);
+                            
+                            // Show summary in a more detailed notification
+                            const summary = data.summary;
+                            const summaryText = `
+                                Title: ${summary.title}
+                                Meta Description: ${summary.meta_description}
+                                H2 Sections: ${summary.h2_sections}
+                                FAQs Generated: ${summary.faqs_generated}
+                            `;
+                            showNotification(summaryText, 'success');
+                        } else {
+                            showNotification('Error generating content: ' + data.error, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        showNotification('Error generating content: ' + error.message, 'error');
+                    })
+                    .finally(() => {
+                        // Reset button state
+                        generateBtn.innerHTML = originalText;
+                        generateBtn.disabled = false;
+                    });
+                }, 200); // 200ms delay after backend sync
+            }).catch(error => {
+                console.error('Error syncing with backend before content generation:', error);
+                showNotification('Error syncing data before content generation. Please try again.', 'error');
+                // Reset button state
+                generateBtn.innerHTML = originalText;
+                generateBtn.disabled = false;
+            });
+        }
+        
+
+        
+        function showNotification(message, type) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type === 'error' ? 'danger' : 'success'} alert-dismissible fade show position-fixed`;
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
