@@ -120,9 +120,11 @@ Your tasks:
 2. **Meta Description**: Create an SEO-friendly meta description (150-160 characters) for "head.meta_description" field
 3. **Content**: Fill in all empty "paragraphs" arrays with 50-80 word paragraphs
 4. **Bullet Points**: Fill in all empty "bullets" arrays with 3-5 relevant bullet points
-5. **FAQs**: Create exactly 20 FAQs in the "body.faqs_html" array, each in HTML format with:
+5. **FAQs**: Create 15-20 FAQs in the "body.faqs_html" array, each in HTML format with:
    - Question in <h2> tags
    - Answer in <p> tags
+   - You MUST generate at least 15 FAQs (20 preferred)
+   - Cover a wide range of common questions about the topic
 
 CRITICAL REQUIREMENTS:
 - Keep the exact JSON structure - do not rename any keys
@@ -131,34 +133,72 @@ CRITICAL REQUIREMENTS:
 - Make content helpful for people interested in the topic
 - Ensure all content is original and well-researched
 - FAQs should cover common questions about the topic
+- CRITICAL: You MUST generate at least 15 FAQs in the faqs_html array (20 preferred)
 
 IMPORTANT: Return ONLY valid JSON. Do not include any explanations, markdown formatting, or text outside the JSON structure. The response must be parseable as valid JSON.
 """
     return prompt
 
+def _get_faq_status(faq_count):
+    """Get status message for FAQ count"""
+    if faq_count >= 20:
+        return f'✅ {faq_count} FAQs generated (perfect!)'
+    elif faq_count >= 15:
+        return f'✅ {faq_count} FAQs generated (acceptable range: 15-20)'
+    else:
+        return f'⚠️ Only {faq_count} FAQs generated (minimum 15 required)'
+
 def clean_json_response(response):
     """Clean and extract JSON from AI response"""
     import re
     
+    if not response or not isinstance(response, str):
+        print(f"❌ Invalid response type: {type(response)}")
+        return ""
+    
+    print(f"🔍 Cleaning response of length: {len(response)}")
+    print(f"🔍 Response starts with: '{response[:100]}...'")
+    
     # Try direct JSON parsing first
     try:
         json.loads(response)
+        print("✅ Direct JSON parsing successful")
         return response
-    except json.JSONDecodeError:
-        pass
+    except json.JSONDecodeError as e:
+        print(f"⚠️ Direct JSON parsing failed: {e}")
     
     # Try to extract JSON from the response
     json_match = re.search(r'\{.*\}', response, re.DOTALL)
     if json_match:
         extracted_json = json_match.group(0)
+        print(f"🔍 Extracted JSON length: {len(extracted_json)}")
+        print(f"🔍 Extracted JSON starts with: '{extracted_json[:100]}...'")
+        
+        # Try to fix common JSON issues
+        cleaned_json = extracted_json
+        
+        # Fix trailing commas before closing braces and brackets
+        cleaned_json = re.sub(r',(\s*[}\]])', r'\1', cleaned_json)
+        
+        # Fix trailing commas before closing quotes
+        cleaned_json = re.sub(r',(\s*")', r'\1', cleaned_json)
+        
         try:
-            json.loads(extracted_json)
-            print("✅ JSON extracted from response")
-            return extracted_json
-        except json.JSONDecodeError:
-            pass
+            json.loads(cleaned_json)
+            print("✅ JSON extracted and cleaned from response")
+            return cleaned_json
+        except json.JSONDecodeError as e:
+            print(f"❌ Extracted JSON parsing failed after cleaning: {e}")
+            # Try the original extracted JSON as fallback
+            try:
+                json.loads(extracted_json)
+                print("✅ Original extracted JSON parsing successful")
+                return extracted_json
+            except json.JSONDecodeError:
+                pass
     
-    return response
+    print(f"❌ No valid JSON found in response")
+    return ""
 
 @app.route('/')
 def index():
@@ -493,6 +533,12 @@ def generate_content():
     print(f"🔍 Received data type: {type(data)}")
     print(f"🔍 Received data: {data}")
     
+    # Get hero section data from frontend
+    hero_data = data.get('hero', {}) if data else {}
+    tagline = hero_data.get('tagline', '')
+    cta_text = hero_data.get('cta_text', '')
+    cta_link = hero_data.get('cta_link', '')
+    
     if data and 'data' in data:
         json_data = data['data']
         print(f"🔍 json_data type: {type(json_data)}")
@@ -556,7 +602,7 @@ def generate_content():
     if identifier:
         print(f"🔍 Using identifier: {identifier}")
     
-    # Create the structured JSON for AI processing
+    # Create the structured JSON for AI processing (without hero section)
     structured_data = {
         'head': {
             'title': '',
@@ -618,8 +664,11 @@ def generate_content():
         try:
             response = model.generate_content(prompt)
             processing_time = time.time() - start_time
+            print(f"✅ Gemini API call completed in {processing_time:.1f}s")
         except Exception as e:
             print(f"❌ Error calling Gemini API: {e}")
+            import traceback
+            traceback.print_exc()
             return jsonify({'error': f'Failed to call Gemini API: {str(e)}'}), 500
         
         print(f"🔍 Raw response from Gemini: {response}")
@@ -632,23 +681,69 @@ def generate_content():
             
             # Clean the response
             cleaned_result = clean_json_response(response.text)
-            print(f"🔍 Cleaned result: {cleaned_result[:200]}...")
+            print(f"🔍 Cleaned result length: {len(cleaned_result) if cleaned_result else 0}")
+            print(f"🔍 Cleaned result: '{cleaned_result}'")
             
             if not cleaned_result or not cleaned_result.strip():
                 print("❌ Error: Cleaned result is empty")
+                print(f"🔍 Original response text: '{response.text}'")
                 return jsonify({'error': 'AI returned empty response'}), 500
             
             # Try to parse as JSON
             try:
                 ai_generated_data = json.loads(cleaned_result)
+                print(f"✅ JSON parsed successfully, data keys: {list(ai_generated_data.keys())}")
             except json.JSONDecodeError as e:
                 print(f"❌ Error: Response is not valid JSON: {e}")
                 print(f"❌ Failed to parse: {cleaned_result}")
+                import traceback
+                traceback.print_exc()
                 return jsonify({'error': 'AI response is not valid JSON'}), 500
+            
+            # Validate FAQ count
+            faqs_count = len(ai_generated_data.get('body', {}).get('faqs_html', []))
+            if faqs_count < 15:
+                print(f"⚠️ Warning: Generated {faqs_count} FAQs (minimum 15 required). Regenerating...")
+                # Try to regenerate with a more explicit prompt
+                enhanced_prompt = prompt + "\n\nCRITICAL REMINDER: You MUST generate AT LEAST 15 FAQs in the faqs_html array. Current count: " + str(faqs_count) + ". Please regenerate with at least 15 FAQs (20 preferred)."
+                try:
+                    response = model.generate_content(enhanced_prompt)
+                    if response and hasattr(response, 'text') and response.text:
+                        cleaned_result = clean_json_response(response.text)
+                        try:
+                            ai_generated_data = json.loads(cleaned_result)
+                            faqs_count = len(ai_generated_data.get('body', {}).get('faqs_html', []))
+                            print(f"✅ Regenerated with {faqs_count} FAQs")
+                        except json.JSONDecodeError:
+                            print("⚠️ Regeneration failed, using original result")
+                except Exception as e:
+                    print(f"⚠️ Regeneration failed: {e}, using original result")
+            elif faqs_count < 20:
+                print(f"✅ Generated {faqs_count} FAQs (acceptable range: 15-20)")
+            else:
+                print(f"✅ Generated {faqs_count} FAQs (perfect!)")
             
             # Add identifier to the final output if provided
             if identifier:
                 ai_generated_data['identifier'] = identifier
+            
+            # Add hero section manually (not generated by AI)
+            ai_generated_data['hero'] = {
+                'tagline': tagline,
+                'cta_text': cta_text,
+                'cta_link': cta_link
+            }
+            
+            # Reorder keys to match required structure: hero, head, body, identifier
+            ordered_data = {}
+            if 'hero' in ai_generated_data:
+                ordered_data['hero'] = ai_generated_data['hero']
+            if 'head' in ai_generated_data:
+                ordered_data['head'] = ai_generated_data['head']
+            if 'body' in ai_generated_data:
+                ordered_data['body'] = ai_generated_data['body']
+            if 'identifier' in ai_generated_data:
+                ordered_data['identifier'] = ai_generated_data['identifier']
             
             # Create output filename with handle
             h1_keywords = [kw for kw in json_data if kw['tag'] == 'H1']
@@ -684,23 +779,38 @@ def generate_content():
             output_path = os.path.join(target_dir, output_filename)
             
             # Save the result to the target directory
-            with open(output_path, 'w', encoding='utf-8') as file:
-                json.dump(ai_generated_data, file, indent=2, ensure_ascii=False)
-            
-            print(f"✅ Content generated and saved to: {output_path}")
-            
-            return jsonify({
-                'success': True,
-                'message': f'Content generated successfully in {processing_time:.1f}s',
-                'filename': output_filename,
-                'file_path': output_path,
-                'summary': {
-                    'title': ai_generated_data.get('head', {}).get('title', 'Not provided'),
-                    'meta_description': ai_generated_data.get('head', {}).get('meta_description', 'Not provided'),
-                    'h2_sections': len(ai_generated_data.get('body', {}).get('h2_keywords', [])),
-                    'faqs_generated': len(ai_generated_data.get('body', {}).get('faqs_html', []))
+            try:
+                with open(output_path, 'w', encoding='utf-8') as file:
+                    json.dump(ordered_data, file, indent=2, ensure_ascii=False)
+                
+                print(f"✅ Content generated and saved to: {output_path}")
+                
+                # Create response data
+                response_data = {
+                    'success': True,
+                    'message': f'Content generated successfully in {processing_time:.1f}s',
+                    'filename': output_filename,
+                    'file_path': output_path,
+                    'summary': {
+                        'title': ordered_data.get('head', {}).get('title', 'Not provided'),
+                        'meta_description': ordered_data.get('head', {}).get('meta_description', 'Not provided'),
+                        'hero_tagline': ordered_data.get('hero', {}).get('tagline', 'Not provided'),
+                        'hero_cta': ordered_data.get('hero', {}).get('cta_text', 'Not provided'),
+                        'hero_cta_link': ordered_data.get('hero', {}).get('cta_link', 'Not provided'),
+                        'h2_sections': len(ordered_data.get('body', {}).get('h2_keywords', [])),
+                        'faqs_generated': len(ordered_data.get('body', {}).get('faqs_html', [])),
+                        'faqs_status': _get_faq_status(len(ordered_data.get('body', {}).get('faqs_html', [])))
+                    }
                 }
-            })
+                
+                print(f"✅ Response data prepared: {response_data}")
+                return jsonify(response_data)
+                
+            except Exception as file_error:
+                print(f"❌ Error saving file or creating response: {file_error}")
+                import traceback
+                traceback.print_exc()
+                return jsonify({'error': f'Error saving file: {str(file_error)}'}), 500
         else:
             print("❌ Error: No valid response from Gemini AI")
             if response:
@@ -711,6 +821,8 @@ def generate_content():
             
     except Exception as e:
         print(f"❌ Error generating content: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': f'Error generating content: {str(e)}'}), 500
 
 @app.route('/download_generated/<filename>')

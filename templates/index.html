@@ -20,6 +20,7 @@
             --accent-primary: #3182ce;      /* Modern blue accent */
             --accent-secondary: #38a169;    /* Modern green accent */
             --accent-tertiary: #ed8936;     /* Modern orange accent */
+            --accent-cool: #3182ce;         /* Cool blue accent (was missing) */
             --success-color: #38a169;       /* Modern green */
             --warning-color: #ed8936;       /* Modern orange */
             --danger-color: #e53e3e;        /* Modern red */
@@ -43,9 +44,9 @@
         }
 
         .main-container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 20px 15px;
         }
 
         /* Typography improvements */
@@ -63,22 +64,22 @@
         }
 
         .lead {
-            font-size: 1.125rem;
+            font-size: 0.95rem;
             font-weight: 400;
-            line-height: 1.6;
+            line-height: 1.5;
             color: var(--text-secondary) !important;
         }
 
         .upload-area {
             border: 2px dashed var(--border-color);
-            border-radius: 16px;
-            padding: 60px 40px;
+            border-radius: 12px;
+            padding: 40px 30px;
             text-align: center;
             background: var(--bg-card);
             transition: all 0.3s ease;
             cursor: pointer;
             box-shadow: 0 1px 3px var(--shadow-soft);
-            margin-bottom: 40px;
+            margin-bottom: 25px;
         }
 
         .upload-area:hover {
@@ -97,9 +98,9 @@
         .keyword-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 20px;
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 8px;
             transition: all 0.3s ease;
             cursor: move;
             box-shadow: 0 1px 3px var(--shadow-soft);
@@ -121,9 +122,9 @@
         .identifier-section {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
+            border-radius: 12px;
             transition: all 0.3s ease;
-            margin-bottom: 40px;
+            margin-bottom: 25px;
         }
 
         .identifier-section:hover {
@@ -134,114 +135,96 @@
         .identifier-section .card-header {
             background: var(--bg-primary);
             border-bottom: 1px solid var(--border-color);
-            border-radius: 16px 16px 0 0;
-            padding: 24px 30px 20px;
+            border-radius: 12px 12px 0 0;
+            padding: 16px 20px 14px;
         }
 
         .identifier-section .card-body {
-            padding: 30px;
+            padding: 20px;
         }
 
-        /* H1 Keywords - High contrast red */
+        /* H1 Keywords - Small and compact with very light red background */
         .tag-h1 {
-            background: linear-gradient(135deg, var(--h1-color), #e74c3c);
-            color: #ffffff;
-            border: 3px solid var(--h1-color);
-            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+            background: #fff5f5;
+            border: 2px solid var(--text-primary);
+            box-shadow: 0 2px 8px var(--shadow-soft);
             position: relative;
+            padding: 12px 14px !important;
         }
 
         .tag-h1::before {
-            content: "🔥 H1";
+            content: "H1";
             position: absolute;
-            top: -10px;
-            left: 10px;
-            background: #000000;
-            color: var(--h1-color);
-            padding: 3px 10px;
-            border-radius: 8px;
-            font-size: 0.7em;
+            top: -6px;
+            left: 8px;
+            background: var(--text-primary);
+            color: var(--bg-card);
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 0.6em;
             font-weight: 700;
             z-index: 1;
-            border: 2px solid var(--h1-color);
         }
 
         .tag-h1 .keyword-text {
-            color: #ffffff !important;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            font-weight: 800;
-            font-size: 1.6em;
+            color: var(--text-primary) !important;
+            font-weight: 600;
+            font-size: 1.0em;
+            letter-spacing: -0.01em;
         }
 
-        /* H2 Keywords - High contrast blue */
+        /* H2 Keywords - Small and compact with very light blue background */
         .tag-h2 {
-            background: linear-gradient(135deg, var(--h2-color), #0b5ed7);
-            color: #ffffff;
-            border: 3px solid var(--h2-color);
-            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+            background: #f0f8ff;
+            border: 2px solid var(--text-secondary);
+            box-shadow: 0 2px 6px var(--shadow-soft);
+            padding: 12px 14px !important;
         }
 
         .tag-h2 .keyword-text {
-            color: #ffffff !important;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            font-weight: 700;
-            font-size: 1.4em;
+            color: var(--text-primary) !important;
+            font-weight: 600;
+            font-size: 1.0em;
+            letter-spacing: -0.01em;
         }
 
-        /* H3 Keywords - High contrast green */
+        /* H3 Keywords - Small and compact with green background */
         .tag-h3 {
-            background: linear-gradient(135deg, var(--h3-color), #157347);
-            color: #ffffff;
-            border: 3px solid var(--h3-color);
-            box-shadow: 0 4px 12px rgba(25, 135, 84, 0.3);
+            background: #ccd660;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 1px 4px var(--shadow-soft);
+            padding: 12px 14px !important;
         }
 
         .tag-h3 .keyword-text {
-            color: #ffffff !important;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            font-weight: 700;
-            font-size: 1.3em;
+            color: var(--text-primary) !important;
+            font-weight: 500;
+            font-size: 0.95em;
         }
 
-        /* Untagged keywords - Black background */
+        /* Untagged keywords - Subtle styling */
         .tag-untagged {
-            background: linear-gradient(135deg, #000000, #333333);
-            color: #ffffff;
-            border: 3px solid #000000;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            background: var(--bg-card);
+            border: 2px dashed var(--text-muted);
+            box-shadow: 0 1px 3px var(--shadow-soft);
             position: relative;
-        }
-
-        .tag-untagged::before {
-            content: "⚠️ UNTAGGED";
-            position: absolute;
-            top: -10px;
-            left: 10px;
-            background: #ffffff;
-            color: #000000;
-            padding: 3px 10px;
-            border-radius: 8px;
-            font-size: 0.7em;
-            font-weight: 700;
-            z-index: 1;
-            border: 2px solid #000000;
+            padding: 12px 14px !important;
         }
 
         .tag-untagged .keyword-text {
-            color: #ffffff !important;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            font-weight: 700;
-            font-size: 1.4em;
+            color: #000000 !important;
+            font-weight: 500;
+            font-size: 0.95em;
         }
 
         .volume-badge {
-            font-size: 0.85em;
-            padding: 8px 12px;
+            font-size: 0.75em;
+            padding: 6px 10px;
             background: rgba(255, 255, 255, 0.95) !important;
             color: var(--text-primary) !important;
             border: 1px solid var(--border-color);
             font-weight: 600;
-            border-radius: 10px;
+            border-radius: 8px;
             letter-spacing: 0.01em;
         }
 
@@ -280,54 +263,51 @@
         }
 
         .btn-outline-danger {
-            color: #ffffff;
-            border-color: var(--h1-color);
-            background: var(--h1-color);
+            color: var(--text-primary);
+            border-color: var(--text-primary);
+            background: var(--bg-card);
             border-width: 2px;
-            font-weight: 700;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            font-weight: 600;
         }
 
         .btn-outline-danger:hover {
-            color: #ffffff;
-            background: #e74c3c;
-            border-color: #e74c3c;
+            color: var(--bg-card);
+            background: var(--text-primary);
+            border-color: var(--text-primary);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+            box-shadow: 0 4px 12px var(--shadow-medium);
         }
 
         .btn-outline-success {
-            color: #ffffff;
-            border-color: var(--h2-color);
-            background: var(--h2-color);
+            color: var(--text-secondary);
+            border-color: var(--text-secondary);
+            background: var(--bg-card);
             border-width: 2px;
-            font-weight: 700;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            font-weight: 600;
         }
 
         .btn-outline-success:hover {
-            color: #ffffff;
-            background: #0b5ed7;
-            border-color: #0b5ed7;
+            color: var(--bg-card);
+            background: var(--text-secondary);
+            border-color: var(--text-secondary);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
+            box-shadow: 0 4px 12px var(--shadow-medium);
         }
 
         .btn-outline-info {
-            color: #ffffff;
-            border-color: var(--h3-color);
-            background: var(--h3-color);
+            color: var(--text-muted);
+            border-color: var(--text-muted);
+            background: var(--bg-card);
             border-width: 2px;
-            font-weight: 700;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            font-weight: 600;
         }
 
         .btn-outline-info:hover {
-            color: #ffffff;
-            background: #157347;
-            border-color: #157347;
+            color: var(--bg-card);
+            background: var(--text-muted);
+            border-color: var(--text-muted);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(25, 135, 84, 0.4);
+            box-shadow: 0 4px 12px var(--shadow-medium);
         }
 
         .btn-remove {
@@ -369,62 +349,114 @@
         }
 
         .keyword-text.selected {
-            background: #2a2a2a !important;
-            color: #ffffff !important;
-            padding: 8px 12px !important;
-            border-radius: 10px !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
-            border: 3px solid #ffffff !important;
-            font-weight: 800 !important;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+            color: var(--text-primary) !important;
+            padding: 6px 10px !important;
+            border-radius: 8px !important;
+            box-shadow: 0 2px 8px var(--shadow-soft) !important;
+            font-weight: 700 !important;
             position: relative !important;
         }
 
-        /* Specific styling for selected H3 keywords to ensure visibility */
+        /* Maintain hierarchy colors when selected - just add subtle highlight */
+        .tag-h1 .keyword-text.selected {
+            background: rgba(229, 62, 62, 0.15) !important; /* Light red background for H1 */
+            border: 2px solid var(--h1-color) !important;
+            color: var(--text-primary) !important;
+            box-shadow: 0 2px 8px rgba(229, 62, 62, 0.2) !important;
+            font-weight: 600 !important; /* Maintain H1 font weight */
+            font-size: 1.0em !important; /* Maintain H1 font size */
+            letter-spacing: -0.01em !important; /* Maintain H1 letter spacing */
+        }
+
+        .tag-h2 .keyword-text.selected {
+            background: rgba(49, 130, 206, 0.15) !important; /* Light blue background for H2 */
+            border: 2px solid var(--h2-color) !important;
+            color: var(--text-primary) !important;
+            box-shadow: 0 2px 8px rgba(49, 130, 206, 0.2) !important;
+            font-weight: 600 !important; /* Maintain H2 font weight */
+            font-size: 1.0em !important; /* Maintain H2 font size */
+            letter-spacing: -0.01em !important; /* Maintain H2 letter spacing */
+        }
+
         .tag-h3 .keyword-text.selected {
-            background: #1a1a1a !important;
-            color: #ffffff !important;
-            border: 3px solid var(--h3-color) !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important;
+            background: rgba(56, 161, 105, 0.15) !important; /* Light green background for H3 */
+            border: 2px solid var(--h3-color) !important;
+            color: var(--text-primary) !important;
+            box-shadow: 0 2px 8px rgba(56, 161, 105, 0.2) !important;
+            font-weight: 500 !important; /* Maintain H3 font weight */
+            font-size: 0.95em !important; /* Maintain H3 font size */
+        }
+
+        /* Ultra-high specificity override for debugging - REMOVED */
+        /* This was causing all selected keywords to appear red regardless of hierarchy */
+
+        /* Hover effects for selected keywords - maintain hierarchy colors */
+        .tag-h1 .keyword-text.selected:hover {
+            background: rgba(229, 62, 62, 0.25) !important;
+            transform: scale(1.02) !important;
+            box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3) !important;
+        }
+
+        .tag-h2 .keyword-text.selected:hover {
+            background: rgba(49, 130, 206, 0.25) !important;
+            transform: scale(1.02) !important;
+            box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3) !important;
         }
 
         .tag-h3 .keyword-text.selected:hover {
-            background: #2a2a2a !important;
-            color: #ffffff !important;
+            background: rgba(56, 161, 105, 0.25) !important;
             transform: scale(1.02) !important;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.7) !important;
+            box-shadow: 0 4px 12px rgba(56, 161, 105, 0.3) !important;
         }
 
+        /* Remove the "SELECTED" badges - just use subtle highlighting */
         .keyword-text.selected::before {
-            content: "✓ SELECTED";
-            position: absolute;
-            top: -15px;
-            left: 10px;
-            background: #ffffff;
-            color: #333333;
-            padding: 3px 10px;
-            border-radius: 8px;
-            font-size: 0.6em;
-            font-weight: 700;
-            z-index: 1;
-            border: 2px solid #333333;
+            content: none;
         }
 
-        /* Specific badge for selected H3 keywords */
+        /* No specific badges for selected keywords */
+        .tag-h1 .keyword-text.selected::before {
+            content: none;
+        }
+
+        .tag-h2 .keyword-text.selected::before {
+            content: none;
+        }
+
         .tag-h3 .keyword-text.selected::before {
-            content: "✓ SELECTED H3";
-            background: #1a1a1a;
-            color: var(--h3-color);
-            border: 2px solid var(--h3-color);
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+            content: none;
         }
 
+        /* General hover for non-H1/H2/H3 selected keywords */
         .keyword-text.selected:hover {
-            background: #444444 !important;
-            color: #ffffff !important;
+            background: rgba(59, 130, 246, 0.15) !important;
+            color: var(--text-primary) !important;
             text-decoration: none !important;
             transform: scale(1.02) !important;
+        }
+
+        /* Ensure hierarchy colors are maintained even when multiple keywords are selected */
+        .tag-h1 .keyword-text.selected,
+        .tag-h1 .keyword-text.selected:hover {
+            color: var(--text-primary) !important;
+            font-weight: 800 !important;
+            font-size: 1.8em !important;
+            letter-spacing: -0.02em !important;
+        }
+
+        .tag-h2 .keyword-text.selected,
+        .tag-h2 .keyword-text.selected:hover {
+            color: var(--text-primary) !important;
+            font-weight: 700 !important;
+            font-size: 1.4em !important;
+            letter-spacing: -0.01em !important;
+        }
+
+        .tag-h3 .keyword-text.selected,
+        .tag-h3 .keyword-text.selected:hover {
+            color: var(--text-primary) !important;
+            font-weight: 600 !important;
+            font-size: 1.1em !important;
         }
 
         .keyword-text.editing {
@@ -519,10 +551,36 @@
             padding: 16px;
         }
 
+        .copy-icon {
+            transition: all 0.2s ease;
+            opacity: 0.7;
+        }
+
+        .copy-icon:hover {
+            opacity: 1;
+            color: var(--accent-primary) !important;
+            transform: scale(1.1);
+        }
+
+        .copy-icon.copied {
+            color: var(--accent-secondary) !important;
+            animation: copySuccess 0.5s ease;
+        }
+
+        @keyframes copySuccess {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
         .h3-container .keyword-card {
             margin-bottom: 10px;
             border-left: 4px solid var(--accent-cool);
-            background: var(--bg-card);
+        }
+        
+        /* Ensure H3 keywords maintain their green background even when nested */
+        .h3-container .keyword-card.tag-h3 {
+            background: #ccd660;
         }
 
         .h3-container .keyword-card:last-child {
@@ -585,27 +643,31 @@
         }
 
         .search-result-tag.h1 {
-            background: var(--h1-color);
-            color: #ffffff;
-            border: 2px solid #000000;
+            background: var(--text-primary);
+            color: var(--bg-card);
+            border: 1px solid var(--text-primary);
+            font-weight: 700;
         }
 
         .search-result-tag.h2 {
-            background: var(--h2-color);
-            color: #ffffff;
-            border: 2px solid #000000;
+            background: var(--text-secondary);
+            color: var(--bg-card);
+            border: 1px solid var(--text-secondary);
+            font-weight: 600;
         }
 
         .search-result-tag.h3 {
-            background: var(--h3-color);
-            color: #ffffff;
-            border: 2px solid #000000;
+            background: var(--text-muted);
+            color: var(--bg-card);
+            border: 1px solid var(--text-muted);
+            font-weight: 500;
         }
 
         .search-result-tag.untagged {
-            background: #6c757d;
-            color: #ffffff;
-            border: 2px solid #000000;
+            background: var(--text-muted);
+            color: var(--bg-card);
+            border: 1px dashed var(--text-muted);
+            font-weight: 400;
         }
 
         .keyword-card.tag-h2.drag-over {
@@ -614,6 +676,85 @@
             transform: scale(1.02) !important;
             transition: all 0.3s ease;
             box-shadow: 0 6px 16px var(--shadow-medium) !important;
+        }
+        
+        /* H2 section reordering styles */
+        .keyword-card.tag-h2 {
+            cursor: grab;
+            transition: all 0.3s ease;
+        }
+        
+        .keyword-card.tag-h2:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px var(--shadow-medium);
+        }
+        
+        .keyword-card.tag-h2:active {
+            cursor: grabbing;
+            transform: scale(0.98);
+        }
+        
+        .keyword-card.tag-h2.dragging {
+            opacity: 0.8;
+            transform: rotate(2deg) scale(1.05);
+            box-shadow: 0 8px 16px var(--shadow-medium);
+            z-index: 1000;
+        }
+        
+        /* Enhanced drag handle for H2 sections */
+        .keyword-card.tag-h2 .drag-handle {
+            color: var(--h2-color);
+            font-size: 18px;
+            margin-right: 15px;
+            cursor: grab;
+            transition: all 0.3s ease;
+        }
+        
+        .keyword-card.tag-h2 .drag-handle:hover {
+            color: var(--accent-primary);
+            transform: scale(1.1);
+        }
+        
+        .keyword-card.tag-h2:active .drag-handle {
+            cursor: grabbing;
+        }
+
+        /* Reorder buttons styling */
+        .reorder-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .reorder-btn {
+            padding: 4px 6px;
+            font-size: 10px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .reorder-btn:hover {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+            transform: scale(1.1);
+        }
+
+        .reorder-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .reorder-btn:disabled:hover {
+            background: var(--bg-card);
+            color: var(--text-muted);
+            border-color: var(--border-color);
+            transform: none;
         }
 
         .keyword-card.tag-h3 {
@@ -848,16 +989,49 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-6">
+                                   <div class="col-md-6">
+                   <div class="form-group">
+                       <label for="projectHandle" class="form-label">Handle</label>
+                       <input type="text" class="form-control" id="projectHandle" placeholder="Enter project handle (e.g., acrylic-nails-project)" required>
+                   </div>
+               </div>
+               <div class="col-md-6">
+                   <div class="form-group">
+                       <label for="projectTags" class="form-label">Tags</label>
+                       <input type="text" class="form-control" id="projectTags" placeholder="Enter tags separated by commas (e.g., nails, beauty, acrylic)" required>
+                   </div>
+               </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hero Section -->
+        <div class="card mt-4 hero-section">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-star"></i> Hero Section</h5>
+                <small class="text-muted">Enter these fields manually - they will be included in the final JSON</small>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
                         <div class="form-group">
-                            <label for="projectHandle" class="form-label">Handle</label>
-                            <input type="text" class="form-control" id="projectHandle" placeholder="Enter project handle (e.g., acrylic-nails-project)">
+                            <label for="heroTagline" class="form-label">Tagline</label>
+                            <input type="text" class="form-control" id="heroTagline" placeholder="Enter compelling headline" required>
+                            <small class="text-muted">Compelling headline for the hero section</small>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
-                            <label for="projectTags" class="form-label">Tags</label>
-                            <input type="text" class="form-control" id="projectTags" placeholder="Enter tags separated by commas (e.g., nails, beauty, acrylic)">
+                            <label for="heroCTA" class="form-label">CTA Text</label>
+                            <input type="text" class="form-control" id="heroCTA" placeholder="e.g., 'Book Now', 'Learn More'" required>
+                            <small class="text-muted">Button text for call-to-action</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="heroCTALink" class="form-label">CTA Link</label>
+                            <input type="text" class="form-control" id="heroCTALink" placeholder="e.g., 'book-appointment'" required>
+                            <small class="text-muted">URL-friendly name for the link</small>
                         </div>
                     </div>
                 </div>
@@ -1069,6 +1243,21 @@
                         }
                     }
                     renderKeywords();
+                    
+                    // Preserve checkbox selections after rendering
+                    setTimeout(() => {
+                        // Restore checkbox selections after re-rendering
+                        document.querySelectorAll('.keyword-checkbox').forEach(checkbox => {
+                            if (checkbox.checked) {
+                                const keywordCard = checkbox.closest('.keyword-card');
+                                const keywordText = keywordCard.querySelector('.keyword-text');
+                                if (keywordText) {
+                                    keywordText.classList.add('selected');
+                                }
+                            }
+                        });
+                    }, 100);
+                    
                     showNotification('Tag updated successfully', 'success');
                 } else {
                     showNotification(data.error, 'error');
@@ -1306,18 +1495,49 @@
             const checkbox = `
                 <div class="form-check me-3">
                     <input class="form-check-input keyword-checkbox" type="checkbox" value="${keyword.id}" 
-                           onchange="updateRemoveButton()" style="width: 18px; height: 18px; cursor: pointer;">
+                           onchange="handleCheckboxChange(this)" style="width: 18px; height: 18px; cursor: pointer;">
                     <label class="form-check-label" for="checkbox-${keyword.id}" style="cursor: pointer;"></label>
                 </div>
             `;
             
-            const keywordText = `<div class="keyword-text" onclick="editKeyword(${keyword.id})" style="cursor: pointer;">${keyword.keyword}</div>`;
+            const copyIcon = keyword.tag === 'H1' ? `<i class="fas fa-copy copy-icon" onclick="copyKeyword('${keyword.keyword}')" title="Copy keyword" style="cursor: pointer; margin-right: 8px; color: var(--text-muted);"></i>` : '';
+            const keywordText = `<div class="keyword-text" onclick="editKeyword(${keyword.id})" style="cursor: pointer;">${copyIcon}${keyword.keyword}</div>`;
+            
+            // Add reorder buttons for H2 sections
+            let reorderButtons = '';
+            if (keyword.tag === 'H2') {
+                reorderButtons = `
+                    <div class="reorder-buttons me-2">
+                        <button class="btn btn-sm btn-outline-secondary reorder-btn" onclick="moveH2Up(${keyword.id})" title="Move H2 up">
+                            <i class="fas fa-chevron-up"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary reorder-btn" onclick="moveH2Down(${keyword.id})" title="Move H2 down">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+                `;
+            }
+            
+            // Add reorder buttons for H3 sections within H2 containers
+            if (keyword.tag === 'H3' && isH2 === false) {
+                reorderButtons = `
+                    <div class="reorder-buttons me-2">
+                        <button class="btn btn-sm btn-outline-secondary reorder-btn" onclick="moveH3Up(${keyword.id})" title="Move H3 up">
+                            <i class="fas fa-chevron-up"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary reorder-btn" onclick="moveH3Down(${keyword.id})" title="Move H3 down">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+                `;
+            }
             
             card.innerHTML = `
                 <div class="d-flex align-items-center justify-content-between">
                     <div class="d-flex align-items-center flex-grow-1">
                         ${checkbox}
                         <i class="fas fa-grip-vertical drag-handle me-2"></i>
+                        ${reorderButtons}
                         <div class="flex-grow-1">
                             ${keywordText}
                             <div class="mt-1">
@@ -1363,6 +1583,228 @@
                 h2Card.addEventListener('dragover', handleH2DragOver);
                 h2Card.addEventListener('drop', handleH2Drop);
             });
+            
+            // Add H2 section reordering functionality
+            setupH2SectionReordering();
+        }
+        
+        function setupH2SectionReordering() {
+            const h2Section = document.querySelector('.mb-4:has(.tag-h2)');
+            if (!h2Section) return;
+            
+            const h2Cards = h2Section.querySelectorAll('.keyword-card.tag-h2');
+            
+            h2Cards.forEach(h2Card => {
+                // Make H2 cards draggable for reordering
+                h2Card.draggable = true;
+                h2Card.addEventListener('dragstart', handleH2SectionDragStart);
+                h2Card.addEventListener('dragend', handleH2SectionDragEnd);
+                h2Card.addEventListener('dragover', handleH2SectionDragOver);
+                h2Card.addEventListener('drop', handleH2SectionDrop);
+            });
+        }
+        
+        function handleH2SectionDragStart(e) {
+            e.stopPropagation(); // Prevent triggering the regular keyword drag
+            e.target.classList.add('dragging');
+            e.dataTransfer.setData('text/plain', e.target.dataset.id);
+            e.dataTransfer.setData('application/h2-section', 'true'); // Mark as H2 section drag
+            
+            // Add visual feedback
+            e.target.style.opacity = '0.7';
+            e.target.style.transform = 'rotate(2deg) scale(1.05)';
+        }
+        
+        function handleH2SectionDragEnd(e) {
+            e.target.classList.remove('dragging');
+            e.target.style.opacity = '';
+            e.target.style.transform = '';
+            
+            // Remove any drop indicators
+            document.querySelectorAll('.keyword-card.tag-h2').forEach(card => {
+                card.classList.remove('drag-over');
+            });
+        }
+        
+        function handleH2SectionDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const draggedId = parseInt(e.dataTransfer.getData('text/plain'));
+            const targetId = parseInt(e.target.closest('.keyword-card').dataset.id);
+            
+            // Only allow H2 to H2 reordering
+            if (draggedId !== targetId) {
+                const h2Card = e.target.closest('.keyword-card.tag-h2');
+                if (h2Card) {
+                    h2Card.classList.add('drag-over');
+                }
+            }
+        }
+        
+        function handleH2SectionDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const draggedId = parseInt(e.dataTransfer.getData('text/plain'));
+            const targetId = parseInt(e.target.closest('.keyword-card').dataset.id);
+            
+            // Reset styling
+            document.querySelectorAll('.keyword-card.tag-h2').forEach(card => {
+                card.classList.remove('drag-over');
+            });
+            
+            if (draggedId !== targetId) {
+                reorderH2Sections(draggedId, targetId);
+            }
+        }
+        
+        function reorderH2Sections(draggedId, targetId) {
+            // Get all H2 keywords
+            const h2Keywords = filteredData.filter(kw => kw.tag === 'H2');
+            
+            // Find the indices of the dragged and target H2 keywords
+            const draggedIndex = h2Keywords.findIndex(kw => kw.id === draggedId);
+            const targetIndex = h2Keywords.findIndex(kw => kw.id === targetId);
+            
+            if (draggedIndex !== -1 && targetIndex !== -1) {
+                // Reorder H2 keywords
+                const [draggedH2] = h2Keywords.splice(draggedIndex, 1);
+                h2Keywords.splice(targetIndex, 0, draggedH2);
+                
+                // Update the order in the main filteredData array
+                let currentOrder = 0;
+                filteredData.forEach(kw => {
+                    if (kw.tag === 'H2') {
+                        // Find the H2 keyword in our reordered list
+                        const h2Kw = h2Keywords.find(h2 => h2.id === kw.id);
+                        if (h2Kw) {
+                            kw.order = currentOrder++;
+                        }
+                    }
+                });
+                
+                // Update backend
+                updateBackendData().then(() => {
+                    renderKeywords();
+                    showNotification('H2 sections reordered successfully', 'success');
+                }).catch(error => {
+                    console.error('Error updating backend data:', error);
+                    showNotification('Error reordering H2 sections. Please try again.', 'error');
+                });
+            }
+        }
+
+        // H2 reordering functions
+        function moveH2Up(keywordId) {
+            const h2Keywords = filteredData.filter(kw => kw.tag === 'H2').sort((a, b) => a.order - b.order);
+            const currentIndex = h2Keywords.findIndex(kw => kw.id === keywordId);
+            
+            if (currentIndex > 0) {
+                // Swap with the previous H2
+                const currentH2 = h2Keywords[currentIndex];
+                const previousH2 = h2Keywords[currentIndex - 1];
+                
+                // Update orders
+                currentH2.order = previousH2.order;
+                previousH2.order = currentH2.order + 1;
+                
+                // Update backend
+                updateBackendData().then(() => {
+                    renderKeywords();
+                    showNotification('H2 section moved up successfully', 'success');
+                }).catch(error => {
+                    console.error('Error updating backend data:', error);
+                    showNotification('Error moving H2 section. Please try again.', 'error');
+                });
+            }
+        }
+
+        function moveH2Down(keywordId) {
+            const h2Keywords = filteredData.filter(kw => kw.tag === 'H2').sort((a, b) => a.order - b.order);
+            const currentIndex = h2Keywords.findIndex(kw => kw.id === keywordId);
+            
+            if (currentIndex < h2Keywords.length - 1) {
+                // Swap with the next H2
+                const currentH2 = h2Keywords[currentIndex];
+                const nextH2 = h2Keywords[currentIndex + 1];
+                
+                // Update orders
+                currentH2.order = nextH2.order;
+                nextH2.order = currentH2.order - 1;
+                
+                // Update backend
+                updateBackendData().then(() => {
+                    renderKeywords();
+                    showNotification('H2 section moved down successfully', 'success');
+                }).catch(error => {
+                    console.error('Error updating backend data:', error);
+                    showNotification('Error moving H2 section. Please try again.', 'error');
+                });
+            }
+        }
+
+        // H3 reordering functions within their parent H2
+        function moveH3Up(keywordId) {
+            const h3Keyword = filteredData.find(kw => kw.id === keywordId);
+            if (!h3Keyword || h3Keyword.tag !== 'H3' || !h3Keyword.parent_id) return;
+            
+            // Get all H3 keywords that belong to the same parent H2
+            const siblingH3s = filteredData.filter(kw => 
+                kw.tag === 'H3' && kw.parent_id === h3Keyword.parent_id
+            ).sort((a, b) => a.order - b.order);
+            
+            const currentIndex = siblingH3s.findIndex(kw => kw.id === keywordId);
+            
+            if (currentIndex > 0) {
+                // Swap with the previous H3
+                const currentH3 = siblingH3s[currentIndex];
+                const previousH3 = siblingH3s[currentIndex - 1];
+                
+                // Update orders
+                currentH3.order = previousH3.order;
+                previousH3.order = currentH3.order + 1;
+                
+                // Update backend
+                updateBackendData().then(() => {
+                    renderKeywords();
+                    showNotification('H3 section moved up successfully', 'success');
+                }).catch(error => {
+                    console.error('Error updating backend data:', error);
+                    showNotification('Error moving H3 section. Please try again.', 'error');
+                });
+            }
+        }
+
+        function moveH3Down(keywordId) {
+            const h3Keyword = filteredData.find(kw => kw.id === keywordId);
+            if (!h3Keyword || h3Keyword.tag !== 'H3' || !h3Keyword.parent_id) return;
+            
+            // Get all H3 keywords that belong to the same parent H2
+            const siblingH3s = filteredData.filter(kw => 
+                kw.tag === 'H3' && kw.parent_id === h3Keyword.parent_id
+            ).sort((a, b) => a.order - b.order);
+            
+            const currentIndex = siblingH3s.findIndex(kw => kw.id === keywordId);
+            
+            if (currentIndex < siblingH3s.length - 1) {
+                // Swap with the next H3
+                const currentH3 = siblingH3s[currentIndex];
+                const nextH3 = siblingH3s[currentIndex + 1];
+                
+                // Update orders
+                currentH3.order = nextH3.order;
+                nextH3.order = currentH3.order - 1;
+                
+                // Update backend
+                updateBackendData().then(() => {
+                    renderKeywords();
+                    showNotification('H3 section moved down successfully', 'success');
+                }).catch(error => {
+                    console.error('Error updating backend data:', error);
+                    showNotification('Error moving H3 section. Please try again.', 'error');
+                });
+            }
         }
 
         function handleDragStart(e) {
@@ -1501,6 +1943,23 @@
                 });
         }
 
+        function handleCheckboxChange(checkbox) {
+            // Add/remove selected class to keyword text
+            const keywordCard = checkbox.closest('.keyword-card');
+            const keywordText = keywordCard.querySelector('.keyword-text');
+            if (checkbox.checked) {
+                keywordText.classList.add('selected');
+                console.log('Added selected class to:', keywordText.textContent);
+                console.log('Element classes:', keywordText.className);
+                console.log('Parent card classes:', keywordCard.className);
+            } else {
+                keywordText.classList.remove('selected');
+                console.log('Removed selected class from:', keywordText.textContent);
+            }
+            
+            updateRemoveButton();
+        }
+        
         function updateRemoveButton() {
             const checkedBoxes = document.querySelectorAll('.keyword-checkbox:checked');
             const removeBtn = document.getElementById('removeH2Btn');
@@ -1586,25 +2045,9 @@
             input.className = 'edit-input';
             input.value = originalText;
             
-            // Create buttons container
-            const buttonsContainer = document.createElement('div');
-            buttonsContainer.className = 'edit-buttons';
-            
-            const saveBtn = document.createElement('button');
-            saveBtn.className = 'edit-btn save-btn';
-            saveBtn.innerHTML = '<i class="fas fa-check"></i> Save';
-            
-            const cancelBtn = document.createElement('button');
-            cancelBtn.className = 'edit-btn cancel-btn';
-            cancelBtn.innerHTML = '<i class="fas fa-times"></i> Cancel';
-            
-            buttonsContainer.appendChild(saveBtn);
-            buttonsContainer.appendChild(cancelBtn);
-            
             // Replace text with input
             keywordElement.innerHTML = '';
             keywordElement.appendChild(input);
-            keywordElement.appendChild(buttonsContainer);
             keywordElement.classList.add('editing');
             
             // Focus and select all text
@@ -1637,9 +2080,6 @@
             };
             
             // Event listeners
-            saveBtn.addEventListener('click', saveEdit);
-            cancelBtn.addEventListener('click', cancelEdit);
-            
             input.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
                     saveEdit();
@@ -1648,10 +2088,15 @@
                 }
             });
             
-            // Click outside to cancel
+            // Auto-save on blur (when input loses focus)
+            input.addEventListener('blur', () => {
+                saveEdit();
+            });
+            
+            // Click outside to save (redundant with blur, but good for UX)
             const handleClickOutside = (e) => {
                 if (!keywordElement.contains(e.target)) {
-                    cancelEdit();
+                    saveEdit();
                     document.removeEventListener('click', handleClickOutside);
                 }
             };
@@ -1668,6 +2113,14 @@
             
             allCheckboxes.forEach(checkbox => {
                 checkbox.checked = selectAllCheckbox.checked;
+                // Add/remove selected class to keyword text
+                const keywordCard = checkbox.closest('.keyword-card');
+                const keywordText = keywordCard.querySelector('.keyword-text');
+                if (checkbox.checked) {
+                    keywordText.classList.add('selected');
+                } else {
+                    keywordText.classList.remove('selected');
+                }
             });
             
             updateRemoveButton();
@@ -1801,10 +2254,30 @@
             const handle = document.getElementById('projectHandle').value.trim();
             const tags = document.getElementById('projectTags').value.trim();
             
+            // Get hero section data from form inputs
+            const heroTagline = document.getElementById('heroTagline').value.trim();
+            const heroCTA = document.getElementById('heroCTA').value.trim();
+            const heroCTALink = document.getElementById('heroCTALink').value.trim();
+            
+            // Validate hero section data
+            if (!heroTagline || !heroCTA || !heroCTALink) {
+                showNotification('Please fill in all hero section fields (Tagline, CTA Text, and CTA Link)', 'error');
+                generateBtn.innerHTML = originalText;
+                generateBtn.disabled = false;
+                return;
+            }
+            
             // Store identifier data for later use in the final output
             const identifierData = {
                 handle: handle || 'default-handle',
                 tags: tags || 'default-tags'
+            };
+            
+            // Store hero section data
+            const heroData = {
+                tagline: heroTagline,
+                cta_text: heroCTA,
+                cta_link: heroCTALink
             };
             
             // First, ensure backend is synced with the data we want to generate content for
@@ -1818,7 +2291,8 @@
                         },
                         body: JSON.stringify({ 
                             data: filteredData,
-                            identifier: identifierData
+                            identifier: identifierData,
+                            hero: heroData
                         })
                     })
                     .then(response => response.json())
@@ -1839,6 +2313,9 @@ File saved to: D:/articles/nails/${data.filename}`;
 📄 Content Summary:
 • Title: ${summary.title}
 • Meta Description: ${summary.meta_description}
+• Hero Tagline: ${summary.hero_tagline}
+• Hero CTA: ${summary.hero_cta}
+• Hero CTA Link: ${summary.hero_cta_link}
 • H2 Sections: ${summary.h2_sections}
 • FAQs Generated: ${summary.faqs_generated}
 • File Location: D:/articles/nails/${data.filename}
@@ -1885,6 +2362,29 @@ File saved to: D:/articles/nails/${data.filename}`;
         
 
         
+        function copyKeyword(keyword) {
+            // Copy the keyword to clipboard
+            navigator.clipboard.writeText(keyword).then(() => {
+                // Find the copy icon and add visual feedback
+                const copyIcons = document.querySelectorAll('.copy-icon');
+                copyIcons.forEach(icon => {
+                    if (icon.parentElement.textContent.includes(keyword)) {
+                        icon.classList.add('copied');
+                        // Remove the copied class after animation
+                        setTimeout(() => {
+                            icon.classList.remove('copied');
+                        }, 500);
+                    }
+                });
+                
+                // Show success notification
+                showNotification(`✅ Copied: "${keyword}"`, 'success');
+            }).catch(err => {
+                console.error('Failed to copy keyword:', err);
+                showNotification('❌ Failed to copy keyword', 'error');
+            });
+        }
+
         function showNotification(message, type) {
             // Create notification element
             const notification = document.createElement('div');

@@ -43,6 +43,7 @@ def load_json_data(file_path: str) -> Dict[str, Any]:
 
 def create_prompt(json_data: Dict[str, Any]) -> str:
     """Create a comprehensive prompt for Gemini AI"""
+    
     prompt = f"""
 You are an expert content writer and SEO specialist. You will receive a JSON structure for an article and need to fill it with high-quality, SEO-optimized content.
 
@@ -55,9 +56,11 @@ Your tasks:
 2. **Meta Description**: Create an SEO-friendly meta description (150-160 characters) for "meta_description" field
 3. **Content**: Fill in all empty "paragraphs" arrays with 50-80 word paragraphs
 4. **Bullet Points**: Fill in all empty "bullets" arrays with 3-5 relevant bullet points
-5. **FAQs**: Create exactly 20 FAQs in the "faqs_html" array, each in HTML format with:
+5. **FAQs**: Create EXACTLY 20 FAQs in the "faqs_html" array, each in HTML format with:
    - Question in <h2> tags
    - Answer in <p> tags
+   - You MUST generate exactly 20 FAQs - no more, no less
+   - Cover a wide range of common questions about the topic
 
 CRITICAL REQUIREMENTS:
 - Keep the exact JSON structure - do not rename any keys
@@ -66,6 +69,8 @@ CRITICAL REQUIREMENTS:
 - Make content helpful for people interested in the topic
 - Ensure all content is original and well-researched
 - FAQs should cover common questions about the topic
+- CRITICAL: You MUST generate exactly 20 FAQs in the faqs_html array - this is non-negotiable
+- DO NOT add a hero section - it will be added manually
 
 IMPORTANT: Return ONLY valid JSON. Do not include any explanations, markdown formatting, or text outside the JSON structure. The response must be parseable as valid JSON.
 """
@@ -114,6 +119,13 @@ def save_result(result: str, original_file: str) -> bool:
         # Try to parse as JSON
         try:
             json_data = json.loads(cleaned_result)
+            
+            # Validate FAQ count
+            faqs_count = len(json_data.get('faqs_html', []))
+            if faqs_count != 20:
+                print(f"⚠️ Warning: Generated {faqs_count} FAQs instead of 20.")
+                print("⚠️ Please regenerate content to get exactly 20 FAQs.")
+                    
         except json.JSONDecodeError as e:
             print(f"❌ Error: Response is not valid JSON: {e}")
             print("\n📄 Raw AI Response:")
@@ -138,7 +150,12 @@ def save_result(result: str, original_file: str) -> bool:
         print(f"   Title: {json_data.get('title', 'Not provided')}")
         print(f"   Meta Description: {json_data.get('meta_description', 'Not provided')}")
         print(f"   H2 Sections: {len(json_data.get('h2_keywords', []))}")
-        print(f"   FAQs Generated: {len(json_data.get('faqs_html', []))}")
+        faqs_count = len(json_data.get('faqs_html', []))
+        print(f"   FAQs Generated: {faqs_count}")
+        if faqs_count == 20:
+            print("   ✅ FAQ Status: Exactly 20 FAQs generated")
+        else:
+            print(f"   ⚠️ FAQ Status: Only {faqs_count} FAQs generated (should be 20)")
         
         return True
         
