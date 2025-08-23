@@ -6,11 +6,8 @@ GEMINI_API_KEY=YOUR_NEW_API_KEY_HERE
 FLASK_SECRET_KEY=your-secret-key-here
 FLASK_ENV=development
 
-
-
-
 # Cloudinary Configuration
 # Get your credentials from https://cloudinary.com/console
-CLOUDINARY_CLOUD_NAME=dvpoab5n3
-CLOUDINARY_API_KEY=489926662195658
-CLOUDINARY_API_SECRET=uY2vasTeUR0ZfeCCAXmZBTznCx8
+CLOUDINARY_CLOUD_NAME=your_cloud_name_here
+CLOUDINARY_API_KEY=your_api_key_here
+CLOUDINARY_API_SECRET=your_api_secret_here
