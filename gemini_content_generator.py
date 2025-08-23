@@ -101,14 +101,80 @@ def clean_json_response(response: str) -> str:
     json_match = re.search(r'\{.*\}', response, re.DOTALL)
     if json_match:
         extracted_json = json_match.group(0)
+        
+        # Try to fix common JSON issues
+        cleaned_json = extracted_json
+        
+        # Fix trailing commas before closing braces and brackets
+        cleaned_json = re.sub(r',(\s*[}\]])', r'\1', cleaned_json)
+        
+        # Fix trailing commas before closing quotes
+        cleaned_json = re.sub(r',(\s*")', r'\1', cleaned_json)
+        
+        # Fix trailing commas in object properties
+        cleaned_json = re.sub(r',(\s*})', r'\1', cleaned_json)
+        
+        # Fix trailing commas in arrays
+        cleaned_json = re.sub(r',(\s*\])', r'\1', cleaned_json)
+        
+        # Remove any stray characters at the end
+        cleaned_json = re.sub(r'[^\w\s\{\}\[\]",:.\-_\s]+$', '', cleaned_json)
+        
+        # Remove any trailing single quotes
+        cleaned_json = re.sub(r"'$", '', cleaned_json)
+        
         try:
-            json.loads(extracted_json)
-            print("✅ JSON extracted from response")
-            return extracted_json
+            json.loads(cleaned_json)
+            print("✅ JSON extracted and cleaned from response")
+            return cleaned_json
         except json.JSONDecodeError:
-            pass
+            try:
+                json.loads(extracted_json)
+                print("✅ JSON extracted from response")
+                return extracted_json
+            except json.JSONDecodeError:
+                pass
     
     return response
+
+def validate_and_fix_json(json_data):
+    """Validate and fix JSON data before saving"""
+    import re
+    
+    if isinstance(json_data, str):
+        # If it's a string, try to parse it first
+        try:
+            json_data = json.loads(json_data)
+        except json.JSONDecodeError as e:
+            print(f"❌ JSON validation failed: {e}")
+            return None
+    
+    # Convert back to string for cleaning
+    json_string = json.dumps(json_data, indent=2, ensure_ascii=False)
+    
+    # Apply comprehensive cleaning
+    cleaned_json = json_string
+    
+    # Fix trailing commas in objects
+    cleaned_json = re.sub(r',(\s*})', r'\1', cleaned_json)
+    
+    # Fix trailing commas in arrays
+    cleaned_json = re.sub(r',(\s*\])', r'\1', cleaned_json)
+    
+    # Remove any stray characters at the end
+    cleaned_json = re.sub(r'[^\w\s\{\}\[\]",:.\-_\s]+$', '', cleaned_json)
+    
+    # Remove any trailing single quotes
+    cleaned_json = re.sub(r"'$", '', cleaned_json)
+    
+    # Try to parse the cleaned JSON
+    try:
+        validated_data = json.loads(cleaned_json)
+        print("✅ JSON validated and cleaned successfully")
+        return validated_data
+    except json.JSONDecodeError as e:
+        print(f"❌ JSON validation failed after cleaning: {e}")
+        return None
 
 def save_result(result: str, original_file: str) -> bool:
     """Save the filled JSON result to a file"""
@@ -119,6 +185,18 @@ def save_result(result: str, original_file: str) -> bool:
         # Try to parse as JSON
         try:
             json_data = json.loads(cleaned_result)
+            
+            # Validate and fix JSON before saving
+            validated_data = validate_and_fix_json(json_data)
+            if validated_data is None:
+                print(f"❌ Error: Failed to validate JSON data")
+                print("\n📄 Raw AI Response:")
+                print("-" * 50)
+                print(cleaned_result)
+                print("-" * 50)
+                return False
+            
+            json_data = validated_data
             
             # Validate FAQ count
             faqs_count = len(json_data.get('faqs_html', []))

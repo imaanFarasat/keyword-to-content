@@ -51,6 +51,9 @@ def validate_handle(handle):
     if not handle:
         return False, "Handle cannot be empty"
     
+    # Replace spaces with hyphens
+    handle = re.sub(r'\s+', '-', handle)
+    
     # Check if handle contains only valid characters (letters, numbers, hyphens)
     if not re.match(r'^[a-z0-9-]+$', handle):
         return False, "Handle can only contain lowercase letters, numbers, and hyphens"
@@ -65,10 +68,11 @@ def validate_handle(handle):
     
     return True, handle
 
-def validate_tags(tags):
+def validate_tags(tags, handle=None):
     """
     Validate tags format
     Tags should be comma-separated values like 'nail, nail design, manicure'
+    If handle is provided, tags will be automatically synced to match handle content with spaces
     """
     if not tags or not isinstance(tags, str):
         return False, "Tags must be a non-empty string"
@@ -79,6 +83,13 @@ def validate_tags(tags):
     # Check if tags is empty after trimming
     if not tags:
         return False, "Tags cannot be empty"
+    
+    # If handle is provided, automatically sync tags to match handle content with spaces
+    if handle:
+        # Convert handle back to space-separated format (reverse of handle processing)
+        handle_with_spaces = re.sub(r'-+', ' ', handle).strip()
+        # Use the handle content as the primary tag
+        return True, handle_with_spaces
     
     # Split by comma and clean each tag
     tag_list = [tag.strip() for tag in tags.split(',')]
@@ -148,6 +159,72 @@ def _get_faq_status(faq_count):
     else:
         return f'⚠️ Only {faq_count} FAQs generated (minimum 15 required)'
 
+def generate_faq_schema(faqs_html):
+    """Generate FAQ schema JSON-LD from FAQs HTML"""
+    try:
+        if not faqs_html or not isinstance(faqs_html, list):
+            print("⚠️ No FAQs HTML provided or invalid format")
+            return {}
+        
+        # Extract questions and answers from HTML
+        faq_items = []
+        for i, faq_html in enumerate(faqs_html):
+            try:
+                if not isinstance(faq_html, str):
+                    print(f"⚠️ FAQ {i} is not a string, skipping")
+                    continue
+                    
+                # Extract question (text between <h2> tags)
+                question_match = re.search(r'<h2[^>]*>(.*?)</h2>', faq_html, re.DOTALL | re.IGNORECASE)
+                if not question_match:
+                    print(f"⚠️ Could not extract question from FAQ {i}")
+                    continue
+                    
+                # Extract answer (text between <p> tags)
+                answer_match = re.search(r'<p[^>]*>(.*?)</p>', faq_html, re.DOTALL | re.IGNORECASE)
+                if not answer_match:
+                    print(f"⚠️ Could not extract answer from FAQ {i}")
+                    continue
+                    
+                question = question_match.group(1).strip()
+                answer = answer_match.group(1).strip()
+                
+                # Clean HTML tags from answer
+                answer = re.sub(r'<[^>]+>', '', answer)
+                
+                if question and answer:
+                    faq_items.append({
+                        "@type": "Question",
+                        "name": question,
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": answer
+                        }
+                    })
+                else:
+                    print(f"⚠️ FAQ {i} has empty question or answer after processing")
+            except Exception as e:
+                print(f"⚠️ Error processing FAQ {i}: {e}")
+                continue
+        
+        if not faq_items:
+            print("⚠️ No valid FAQ items found")
+            return {}
+        
+        # Create FAQ schema
+        faq_schema = {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": faq_items
+        }
+        
+        print(f"✅ Successfully generated FAQ schema with {len(faq_items)} items")
+        return faq_schema
+        
+    except Exception as e:
+        print(f"❌ Error in generate_faq_schema: {e}")
+        return {}
+
 def clean_json_response(response):
     """Clean and extract JSON from AI response"""
     import re
@@ -183,6 +260,18 @@ def clean_json_response(response):
         # Fix trailing commas before closing quotes
         cleaned_json = re.sub(r',(\s*")', r'\1', cleaned_json)
         
+        # Fix trailing commas in object properties
+        cleaned_json = re.sub(r',(\s*})', r'\1', cleaned_json)
+        
+        # Fix trailing commas in arrays
+        cleaned_json = re.sub(r',(\s*\])', r'\1', cleaned_json)
+        
+        # Remove any stray characters at the end
+        cleaned_json = re.sub(r'[^\w\s\{\}\[\]",:.\-_\s]+$', '', cleaned_json)
+        
+        # Remove any trailing single quotes
+        cleaned_json = re.sub(r"'$", '', cleaned_json)
+        
         try:
             json.loads(cleaned_json)
             print("✅ JSON extracted and cleaned from response")
@@ -199,6 +288,45 @@ def clean_json_response(response):
     
     print(f"❌ No valid JSON found in response")
     return ""
+
+def validate_and_fix_json(json_data):
+    """Validate and fix JSON data before saving"""
+    import re
+    
+    if isinstance(json_data, str):
+        # If it's a string, try to parse it first
+        try:
+            json_data = json.loads(json_data)
+        except json.JSONDecodeError as e:
+            print(f"❌ JSON validation failed: {e}")
+            return None
+    
+    # Convert back to string for cleaning
+    json_string = json.dumps(json_data, indent=2, ensure_ascii=False)
+    
+    # Apply comprehensive cleaning
+    cleaned_json = json_string
+    
+    # Fix trailing commas in objects
+    cleaned_json = re.sub(r',(\s*})', r'\1', cleaned_json)
+    
+    # Fix trailing commas in arrays
+    cleaned_json = re.sub(r',(\s*\])', r'\1', cleaned_json)
+    
+    # Remove any stray characters at the end
+    cleaned_json = re.sub(r'[^\w\s\{\}\[\]",:.\-_\s]+$', '', cleaned_json)
+    
+    # Remove any trailing single quotes
+    cleaned_json = re.sub(r"'$", '', cleaned_json)
+    
+    # Try to parse the cleaned JSON
+    try:
+        validated_data = json.loads(cleaned_json)
+        print("✅ JSON validated and cleaned successfully")
+        return validated_data
+    except json.JSONDecodeError as e:
+        print(f"❌ JSON validation failed after cleaning: {e}")
+        return None
 
 @app.route('/')
 def index():
@@ -430,7 +558,9 @@ def download_json():
                 identifier['handle'] = result  # Use validated handle
             
             if 'tags' in identifier:
-                is_valid, result = validate_tags(identifier['tags'])
+                # Get the validated handle to sync tags
+                validated_handle = identifier.get('handle', '')
+                is_valid, result = validate_tags(identifier['tags'], validated_handle)
                 if not is_valid:
                     return jsonify({'error': f'Invalid tags: {result}'}), 400
                 identifier['tags'] = result  # Use validated tags
@@ -467,6 +597,9 @@ def download_json():
             'h1_keywords': [],
             'h2_keywords': [],
             'faqs_html': []
+        },
+        'script': {
+            'faq_schema': {}
         }
     }
     
@@ -509,9 +642,24 @@ def download_json():
         
         structured_data['body']['h2_keywords'].append(h2_entry)
     
+    # Reorder keys to match required structure: hero, head, body, images, script, identifier
+    ordered_data = {}
+    if 'hero' in structured_data:
+        ordered_data['hero'] = structured_data['hero']
+    if 'head' in structured_data:
+        ordered_data['head'] = structured_data['head']
+    if 'body' in structured_data:
+        ordered_data['body'] = structured_data['body']
+    if 'images' in structured_data:
+        ordered_data['images'] = structured_data['images']
+    if 'script' in structured_data:
+        ordered_data['script'] = structured_data['script']
+    if 'identifier' in structured_data:
+        ordered_data['identifier'] = structured_data['identifier']
+    
     # Create temporary file
     with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False, encoding='utf-8') as f:
-        json.dump(structured_data, f, indent=2, ensure_ascii=False)
+        json.dump(ordered_data, f, indent=2, ensure_ascii=False)
         temp_file = f.name
     
     return send_file(
@@ -538,6 +686,52 @@ def generate_content():
     tagline = hero_data.get('tagline', '')
     cta_text = hero_data.get('cta_text', '')
     cta_link = hero_data.get('cta_link', '')
+    image_url = hero_data.get('image_url', '')
+    alt_text = hero_data.get('alt_text', '')
+    
+    # Get images data from frontend (Cloudinary URLs with alt text)
+    images_data = data.get('images', []) if data else []
+    
+    # Get handle for consistent image naming
+    handle = ''
+    if data and 'identifier' in data and isinstance(data['identifier'], dict):
+        handle = data['identifier'].get('handle', '')
+    
+    # Ensure images_data is properly structured with alt text
+    if images_data and isinstance(images_data, list):
+        # If images_data contains just URLs (old format), convert to new format
+        if images_data and isinstance(images_data[0], str):
+            # Use handle as filename for all images, with index for uniqueness
+            processed_images = []
+            for i, url in enumerate(images_data):
+                if url and isinstance(url, str):
+                    # Use handle as base filename, add index if multiple images
+                    if handle:
+                        filename = f"{handle}_{i+1}" if len(images_data) > 1 else handle
+                    else:
+                        # Fallback to extracted filename if no handle
+                        filename = url.split('/')[-1].split('.')[0]
+                    processed_images.append({
+                        'url': url,
+                        'alt': filename
+                    })
+            images_data = processed_images
+        # If already in new format (list of objects), ensure it has the right structure
+        elif images_data and isinstance(images_data[0], dict):
+            processed_images = []
+            for i, img in enumerate(images_data):
+                if isinstance(img, dict) and 'url' in img:
+                    # Use handle as filename for all images, with index for uniqueness
+                    if handle:
+                        filename = f"{handle}_{i+1}" if len(images_data) > 1 else handle
+                    else:
+                        # Fallback to existing alt text or default
+                        filename = img.get('alt', 'image')
+                    processed_images.append({
+                        'url': img['url'],
+                        'alt': filename
+                    })
+            images_data = processed_images
     
     if data and 'data' in data:
         json_data = data['data']
@@ -554,7 +748,9 @@ def generate_content():
                 identifier['handle'] = result  # Use validated handle
             
             if 'tags' in identifier:
-                is_valid, result = validate_tags(identifier['tags'])
+                # Get the validated handle to sync tags
+                validated_handle = identifier.get('handle', '')
+                is_valid, result = validate_tags(identifier['tags'], validated_handle)
                 if not is_valid:
                     return jsonify({'error': f'Invalid tags: {result}'}), 400
                 identifier['tags'] = result  # Use validated tags
@@ -578,7 +774,9 @@ def generate_content():
                     identifier['handle'] = result  # Use validated handle
                 
                 if 'tags' in identifier:
-                    is_valid, result = validate_tags(identifier['tags'])
+                    # Get the validated handle to sync tags
+                    validated_handle = identifier.get('handle', '')
+                    is_valid, result = validate_tags(identifier['tags'], validated_handle)
                     if not is_valid:
                         return jsonify({'error': f'Invalid tags: {result}'}), 400
                     identifier['tags'] = result  # Use validated tags
@@ -731,10 +929,36 @@ def generate_content():
             ai_generated_data['hero'] = {
                 'tagline': tagline,
                 'cta_text': cta_text,
-                'cta_link': cta_link
+                'cta_link': cta_link,
+                'image_url': image_url,
+                'alt_text': alt_text
             }
             
-            # Reorder keys to match required structure: hero, head, body, identifier
+            # Add images field manually (not generated by AI)
+            ai_generated_data['images'] = images_data
+            
+            # Validate and fix JSON before saving
+            validated_data = validate_and_fix_json(ai_generated_data)
+            if validated_data is None:
+                print("❌ Failed to validate JSON data")
+                return jsonify({'error': 'Failed to validate JSON data'}), 500
+            
+            ai_generated_data = validated_data
+            
+            # Generate FAQ schema for script field
+            try:
+                faq_schema = generate_faq_schema(ai_generated_data.get('body', {}).get('faqs_html', []))
+                ai_generated_data['script'] = {
+                    'faq_schema': faq_schema
+                }
+            except Exception as e:
+                print(f"⚠️ Warning: Error generating FAQ schema: {e}")
+                # Provide empty schema as fallback
+                ai_generated_data['script'] = {
+                    'faq_schema': {}
+                }
+            
+            # Reorder keys to match required structure: hero, head, body, images, script, identifier
             ordered_data = {}
             if 'hero' in ai_generated_data:
                 ordered_data['hero'] = ai_generated_data['hero']
@@ -742,8 +966,20 @@ def generate_content():
                 ordered_data['head'] = ai_generated_data['head']
             if 'body' in ai_generated_data:
                 ordered_data['body'] = ai_generated_data['body']
+            if 'images' in ai_generated_data:
+                ordered_data['images'] = ai_generated_data['images']
+            if 'script' in ai_generated_data:
+                ordered_data['script'] = ai_generated_data['script']
             if 'identifier' in ai_generated_data:
                 ordered_data['identifier'] = ai_generated_data['identifier']
+            
+            # Final validation before saving
+            final_validated_data = validate_and_fix_json(ordered_data)
+            if final_validated_data is None:
+                print("❌ Failed to validate final JSON data")
+                return jsonify({'error': 'Failed to validate final JSON data'}), 500
+            
+            ordered_data = final_validated_data
             
             # Create output filename with handle
             h1_keywords = [kw for kw in json_data if kw['tag'] == 'H1']
@@ -799,7 +1035,9 @@ def generate_content():
                         'hero_cta_link': ordered_data.get('hero', {}).get('cta_link', 'Not provided'),
                         'h2_sections': len(ordered_data.get('body', {}).get('h2_keywords', [])),
                         'faqs_generated': len(ordered_data.get('body', {}).get('faqs_html', [])),
-                        'faqs_status': _get_faq_status(len(ordered_data.get('body', {}).get('faqs_html', [])))
+                        'faqs_status': _get_faq_status(len(ordered_data.get('body', {}).get('faqs_html', []))),
+                        'images_count': len(ordered_data.get('images', [])),
+                        'script_faq_schema': '✅ FAQ Schema generated' if ordered_data.get('script', {}).get('faq_schema') and ordered_data.get('script', {}).get('faq_schema').get('mainEntity') else '❌ No FAQ Schema'
                     }
                 }
                 
@@ -847,6 +1085,144 @@ def download_generated_file(filename):
     except Exception as e:
         print(f"❌ Error serving file {filename}: {e}")
         return jsonify({'error': 'Error serving file'}), 500
+
+# Image Upload Routes
+import requests
+from PIL import Image
+import io
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
+# Configure Cloudinary (you'll need to set these environment variables)
+cloudinary.config(
+    cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.getenv('CLOUDINARY_API_KEY'),
+    api_secret=os.getenv('CLOUDINARY_API_SECRET')
+)
+
+@app.route('/search_pexels')
+def search_pexels():
+    """Search for images on Pexels"""
+    query = request.args.get('query', '')
+    page = request.args.get('page', '1')
+    
+    if not query:
+        return jsonify({'error': 'Query parameter is required'}), 400
+    
+    pexels_api_key = os.getenv('PEXELS_API_KEY')
+    if not pexels_api_key:
+        return jsonify({'error': 'Pexels API key not configured'}), 500
+    
+    try:
+        headers = {
+            'Authorization': pexels_api_key
+        }
+        response = requests.get(
+            f'https://api.pexels.com/v1/search?query={query}&per_page=12&page={page}',
+            headers=headers
+        )
+        response.raise_for_status()
+        
+        data = response.json()
+        images = []
+        
+        for photo in data.get('photos', []):
+            images.append({
+                'id': photo['id'],
+                'src': {
+                    'medium': photo['src']['medium'],
+                    'large': photo['src']['large']
+                },
+                'alt': photo.get('alt', ''),
+                'photographer': photo['photographer']
+            })
+        
+        return jsonify({
+            'success': True,
+            'images': images,
+            'next_page': data.get('next_page'),
+            'total_results': data.get('total_results', 0)
+        })
+        
+    except requests.RequestException as e:
+        return jsonify({'error': f'Error searching Pexels: {str(e)}'}), 500
+
+@app.route('/upload_to_cloudinary', methods=['POST'])
+def upload_to_cloudinary():
+    """Upload local image to Cloudinary"""
+    print("Cloudinary upload endpoint called")  # Debug log
+    
+    if 'file' not in request.files:
+        print("No file in request.files")  # Debug log
+        return jsonify({'error': 'No file provided'}), 400
+    
+    file = request.files['file']
+    filename = request.form.get('filename', 'image')
+    
+    print(f"File received: {file.filename}, filename: {filename}")  # Debug log
+    
+    if file.filename == '':
+        print("Empty filename")  # Debug log
+        return jsonify({'error': 'No file selected'}), 400
+    
+    try:
+        print("Attempting Cloudinary upload...")  # Debug log
+        # Upload to Cloudinary with custom public_id (filename)
+        result = cloudinary.uploader.upload(
+            file,
+            public_id=filename,
+            overwrite=True,
+            resource_type="image"
+        )
+        
+        print(f"Cloudinary upload successful: {result['secure_url']}")  # Debug log
+        
+        return jsonify({
+            'success': True,
+            'url': result['secure_url'],
+            'public_id': result['public_id']
+        })
+        
+    except Exception as e:
+        print(f"Cloudinary upload error: {e}")  # Debug log
+        import traceback
+        traceback.print_exc()  # Print full error traceback
+        return jsonify({'error': f'Error uploading to Cloudinary: {str(e)}'}), 500
+
+@app.route('/upload_pexels_to_cloudinary', methods=['POST'])
+def upload_pexels_to_cloudinary():
+    """Download Pexels image and upload to Cloudinary"""
+    data = request.get_json()
+    image_url = data.get('imageUrl')
+    filename = data.get('filename', 'pexels-image')
+    
+    if not image_url:
+        return jsonify({'error': 'Image URL is required'}), 400
+    
+    try:
+        # Download the image from Pexels
+        response = requests.get(image_url)
+        response.raise_for_status()
+        
+        # Upload to Cloudinary
+        result = cloudinary.uploader.upload(
+            io.BytesIO(response.content),
+            public_id=filename,
+            overwrite=True,
+            resource_type="image"
+        )
+        
+        return jsonify({
+            'success': True,
+            'url': result['secure_url'],
+            'public_id': result['public_id']
+        })
+        
+    except requests.RequestException as e:
+        return jsonify({'error': f'Error downloading image: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error uploading to Cloudinary: {str(e)}'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

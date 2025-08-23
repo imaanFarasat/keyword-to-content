@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Keyword Hierarchy Dashboard</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔑</text></svg>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -61,6 +62,11 @@
             font-weight: 700;
             letter-spacing: -0.03em;
             color: var(--text-primary) !important;
+        }
+
+        /* Override for the main heading to ensure dark orange color */
+        h1.display-4 {
+            color: #e1640a !important;
         }
 
         .lead {
@@ -133,10 +139,30 @@
         }
 
         .identifier-section .card-header {
-            background: var(--bg-primary);
-            border-bottom: 1px solid var(--border-color);
+            background: #1e3a8a;
+            border-bottom: 1px solid #1e40af;
             border-radius: 12px 12px 0 0;
             padding: 16px 20px 14px;
+            color: white;
+        }
+
+        .identifier-section .card-header h5,
+        .identifier-section .card-header small {
+            color: white !important;
+        }
+
+        /* General card header styling - warm dark blue with white text */
+        .card-header {
+            background: #1e3a8a !important;
+            border-bottom: 1px solid #1e40af !important;
+            color: white !important;
+        }
+
+        .card-header h5,
+        .card-header h6,
+        .card-header small,
+        .card-header .text-muted {
+            color: white !important;
         }
 
         .identifier-section .card-body {
@@ -961,16 +987,122 @@
                 transition-duration: 0.01ms !important;
             }
         }
+
+        /* Image Upload Section Styles */
+        .image-upload-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .image-upload-section:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 4px 16px var(--shadow-medium);
+        }
+
+        .upload-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .pexels-image-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .pexels-image-card:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 4px 12px var(--shadow-medium);
+            transform: translateY(-2px);
+        }
+
+        .pexels-image-card.selected {
+            border-color: var(--accent-primary);
+            background: #ebf8ff;
+            box-shadow: 0 4px 12px var(--shadow-medium);
+        }
+
+        .image-wrapper {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        
+        .pexels-image-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .selected-image-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .selected-image-item:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 4px 12px var(--shadow-medium);
+        }
+
+        .selected-image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .image-filename-input {
+            font-size: 0.9em;
+            padding: 8px 12px;
+        }
+
+        .upload-progress {
+            background: #e2e8f0;
+            border-radius: 4px;
+            height: 8px;
+            margin-top: 8px;
+        }
+
+        .upload-progress-bar {
+            background: var(--accent-primary);
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .cloudinary-url {
+            background: #f7fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-family: monospace;
+            font-size: 0.85em;
+            word-break: break-all;
+        }
     </style>
 </head>
 <body>
     <div class="main-container">
         <div class="text-center mb-4">
-            <h1 class="display-4 text-primary">
+            <h1 class="display-4" style="color: #e1640a;">
                 <i class="fas fa-key"></i> Keyword Hierarchy Dashboard
             </h1>
-            <p class="lead text-muted">Upload your SEMrush CSV and organize keywords into H1, H2, H3 structure</p>
-            <button class="btn btn-secondary" onclick="testConnection()">Test Connection</button>
         </div>
 
         <!-- Upload Section -->
@@ -985,20 +1117,19 @@
         <div class="card mt-4 identifier-section">
             <div class="card-header">
                 <h5 class="mb-0"><i class="fas fa-tags"></i> Project Identifier</h5>
-                <small class="text-muted">These fields will be included in the JSON structure but not sent to AI</small>
             </div>
             <div class="card-body">
                 <div class="row">
                                    <div class="col-md-6">
                    <div class="form-group">
                        <label for="projectHandle" class="form-label">Handle</label>
-                       <input type="text" class="form-control" id="projectHandle" placeholder="Enter project handle (e.g., acrylic-nails-project)" required>
+                       <input type="text" class="form-control" id="projectHandle" required>
                    </div>
                </div>
                <div class="col-md-6">
                    <div class="form-group">
                        <label for="projectTags" class="form-label">Tags</label>
-                       <input type="text" class="form-control" id="projectTags" placeholder="Enter tags separated by commas (e.g., nails, beauty, acrylic)" required>
+                       <input type="text" class="form-control" id="projectTags" required>
                    </div>
                </div>
                 </div>
@@ -1009,31 +1140,134 @@
         <div class="card mt-4 hero-section">
             <div class="card-header">
                 <h5 class="mb-0"><i class="fas fa-star"></i> Hero Section</h5>
-                <small class="text-muted">Enter these fields manually - they will be included in the final JSON</small>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="heroTagline" class="form-label">Tagline</label>
-                            <input type="text" class="form-control" id="heroTagline" placeholder="Enter compelling headline" required>
-                            <small class="text-muted">Compelling headline for the hero section</small>
+                            <input type="text" class="form-control" id="heroTagline" required>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="heroCTA" class="form-label">CTA Text</label>
-                            <input type="text" class="form-control" id="heroCTA" placeholder="e.g., 'Book Now', 'Learn More'" required>
-                            <small class="text-muted">Button text for call-to-action</small>
+                            <select class="form-control" id="heroCTA" required>
+                                <option value="">Select CTA text...</option>
+                                <option value="Book Now!">Book Now!</option>
+                                <option value="Book with Bea">Book with Bea</option>
+                                <option value="Schedule with Bea">Schedule with Bea</option>
+                                <option value="Meet Bea">Meet Bea</option>
+                                <option value="Reserve with Bea">Reserve with Bea</option>
+                                <option value="Plan with Bea">Plan with Bea</option>
+                            </select>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="heroCTALink" class="form-label">CTA Link</label>
-                            <input type="text" class="form-control" id="heroCTALink" placeholder="e.g., 'book-appointment'" required>
-                            <small class="text-muted">URL-friendly name for the link</small>
+                                                           <label for="heroCTALink" class="form-label">CTA Link</label>
+                               <select class="form-control" id="heroCTALink" required>
+                                 <option value="https://bea-nails.bookbuy.ca/">https://bea-nails.bookbuy.ca/</option>
+                               </select>
                         </div>
                     </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="heroImageUrl" class="form-label">Hero Image URL</label>
+                            <select class="form-control" id="heroImageUrl" required>
+                                <option value="">Select hero image...</option>
+                                <option value="https://res.cloudinary.com/dvpoab5n3/image/upload/v1755166888/bea-professional-nail-technician-toronto.png">https://res.cloudinary.com/dvpoab5n3/image/upload/v1755166888/bea-professional-nail-technician-toronto.png</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="heroAltText" class="form-label">Alt Text Image</label>
+                            <select class="form-control" id="heroAltText" required>
+                                <option value="">Select alt text...</option>
+                                <option value="Professional nail technician Bea in Toronto portrait photography">Professional nail technician Bea in Toronto portrait photography</option>
+                                <option value="Bea expert nail artist in downtown Toronto professional headshot">Bea expert nail artist in downtown Toronto professional headshot</option>
+                                <option value="Toronto nail professional Bea posing for beauty industry profile photo">Toronto nail professional Bea posing for beauty industry profile photo</option>
+                                <option value="Bea certified nail technician in downtown Toronto professional portrait">Bea certified nail technician in downtown Toronto professional portrait</option>
+                                <option value="Professional image of Bea nail technician and artist in Toronto">Professional image of Bea nail technician and artist in Toronto</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Image Upload Section -->
+        <div class="card mt-4 image-upload-section">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-images"></i> Image Upload</h5>
+            </div>
+            <div class="card-body">
+                <!-- Upload Options -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <button class="btn btn-outline-primary w-100" onclick="showUploadOption('local')">
+                            <i class="fas fa-upload"></i> Upload from Computer
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-outline-success w-100" onclick="showUploadOption('pexels')">
+                            <i class="fas fa-search"></i> Search Pexels
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Local Upload Section -->
+                <div id="localUploadSection" class="upload-section" style="display: none;">
+                    <div class="mb-3">
+                        <label for="imageFileInput" class="form-label">Choose Image File</label>
+                        <input type="file" class="form-control" id="imageFileInput" accept="image/*" multiple>
+                    </div>
+                </div>
+
+                <!-- Pexels Search Section -->
+                <div id="pexelsSearchSection" class="upload-section" style="display: none;">
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="pexelsSearchInput">
+                            <button class="btn btn-primary" onclick="searchPexels()">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                    <div id="pexelsResults" class="row"></div>
+                    <div id="loadMoreSection" class="text-center mt-3" style="display: none;">
+                        <button class="btn btn-outline-primary" onclick="loadMorePexels()">
+                            <i class="fas fa-plus"></i> Load More Images
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Selected Images Section -->
+                <div id="selectedImagesSection" style="display: none;">
+                    <h6 class="mb-3">Selected Images</h6>
+                    
+                    <!-- Bulk Actions -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="bulkFileName">
+                                <button class="btn btn-outline-secondary" onclick="applyBulkFileName()">
+                                    <i class="fas fa-copy"></i> Apply to All
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-success" onclick="uploadToCloudinary()">
+                                <i class="fas fa-cloud-upload-alt"></i> Upload to Cloudinary
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Images List -->
+                    <div id="selectedImagesList" class="row"></div>
                 </div>
             </div>
         </div>
@@ -1043,7 +1277,7 @@
             <div class="row align-items-center justify-content-between">
                 <div class="col-md-2">
                     <div class="input-group">
-                        <input type="number" class="form-control" id="volumeFilter" value="400" min="0" placeholder="Volume">
+                        <input type="number" class="form-control" id="volumeFilter" value="400" min="0">
                         <button class="btn btn-dark" onclick="filterKeywords()">
                             <i class="fas fa-filter"></i> Filter
                         </button>
@@ -1054,7 +1288,7 @@
                         <button class="btn btn-dark" onclick="downloadStructuredJSON()">
                             <i class="fas fa-download"></i> Download JSON
                         </button>
-                        <button class="btn btn-primary" onclick="generateContent()" id="generateBtn">
+                        <button class="btn btn-primary" onclick="handleGenerateOrDownload()" id="generateBtn">
                             <i class="fas fa-magic"></i> Generate Content
                         </button>
                     </div>
@@ -1089,7 +1323,6 @@
         <div class="keywords-container" id="keywordsContainer" style="display: none;">
             <h4 class="mb-3">
                 <i class="fas fa-list"></i> Keywords
-                <small class="text-muted">(Drag to reorder, click tags to assign)</small>
             </h4>
             
             <!-- Search Section -->
@@ -1098,7 +1331,7 @@
                     <span class="input-group-text">
                         <i class="fas fa-search"></i>
                     </span>
-                    <input type="text" class="form-control" id="keywordSearch" placeholder="Search keywords..." oninput="searchKeywords()">
+                    <input type="text" class="form-control" id="keywordSearch" oninput="searchKeywords()">
                     <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()">
                         <i class="fas fa-times"></i> Clear
                     </button>
@@ -1123,7 +1356,6 @@
 
         // File upload handling
         const fileInput = document.getElementById('fileInput');
-        console.log('File input element:', fileInput); // Debug log
         
         fileInput.addEventListener('change', (event) => {
             console.log('File input change event triggered'); // Debug log
@@ -1258,6 +1490,9 @@
                         });
                     }, 100);
                     
+                    // Reset generate button since data has changed
+                    resetGenerateButton();
+                    
                     showNotification('Tag updated successfully', 'success');
                 } else {
                     showNotification(data.error, 'error');
@@ -1309,6 +1544,8 @@
                     // Update backend with the new data and wait for completion
                     updateBackendData().then(() => {
                         renderKeywords();
+                        // Reset generate button since data has changed
+                        resetGenerateButton();
                         showNotification('Keyword removed successfully', 'success');
                     }).catch(error => {
                         console.error('Error updating backend data:', error);
@@ -1687,6 +1924,8 @@
                 // Update backend
                 updateBackendData().then(() => {
                     renderKeywords();
+                    // Reset generate button since data has changed
+                    resetGenerateButton();
                     showNotification('H2 sections reordered successfully', 'success');
                 }).catch(error => {
                     console.error('Error updating backend data:', error);
@@ -1712,6 +1951,8 @@
                 // Update backend
                 updateBackendData().then(() => {
                     renderKeywords();
+                    // Reset generate button since data has changed
+                    resetGenerateButton();
                     showNotification('H2 section moved up successfully', 'success');
                 }).catch(error => {
                     console.error('Error updating backend data:', error);
@@ -1736,6 +1977,8 @@
                 // Update backend
                 updateBackendData().then(() => {
                     renderKeywords();
+                    // Reset generate button since data has changed
+                    resetGenerateButton();
                     showNotification('H2 section moved down successfully', 'success');
                 }).catch(error => {
                     console.error('Error updating backend data:', error);
@@ -1768,6 +2011,8 @@
                 // Update backend
                 updateBackendData().then(() => {
                     renderKeywords();
+                    // Reset generate button since data has changed
+                    resetGenerateButton();
                     showNotification('H3 section moved up successfully', 'success');
                 }).catch(error => {
                     console.error('Error updating backend data:', error);
@@ -1799,6 +2044,8 @@
                 // Update backend
                 updateBackendData().then(() => {
                     renderKeywords();
+                    // Reset generate button since data has changed
+                    resetGenerateButton();
                     showNotification('H3 section moved down successfully', 'success');
                 }).catch(error => {
                     console.error('Error updating backend data:', error);
@@ -1883,6 +2130,8 @@
                 // Update backend
                 updateBackendData().then(() => {
                     renderKeywords();
+                    // Reset generate button since data has changed
+                    resetGenerateButton();
                     showNotification(`"${draggedKeyword.keyword}" assigned to "${targetKeyword.keyword}"`, 'success');
                 }).catch(error => {
                     console.error('Error updating backend data:', error);
@@ -1912,8 +2161,10 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        renderKeywords();
-                        showNotification('Keywords reordered successfully', 'success');
+                                            renderKeywords();
+                    // Reset generate button since data has changed
+                    resetGenerateButton();
+                    showNotification('Keywords reordered successfully', 'success');
                     } else {
                         showNotification(data.error, 'error');
                     }
@@ -1941,6 +2192,44 @@
                     console.error('Test error:', error); // Debug log
                     showNotification('Connection test failed: ' + error.message, 'error');
                 });
+        }
+        
+        function testHandleFormatting() {
+            console.log('Testing handle formatting...');
+            const testCases = [
+                'almond nails',
+                'ALMOND NAILS',
+                'almond  nails',
+                'almond-nails',
+                'almond nails!',
+                'almond nails 123',
+                '  almond nails  ',
+                'almond--nails'
+            ];
+            
+            testCases.forEach(testCase => {
+                const result = formatHandle(testCase);
+                console.log(`"${testCase}" -> "${result}"`);
+            });
+            
+            // Test the actual input field
+            const handleInput = document.getElementById('projectHandle');
+            if (handleInput) {
+                console.log('Testing with actual input field...');
+                handleInput.value = 'test almond nails';
+                console.log('Before formatting:', handleInput.value);
+                const formatted = formatHandle(handleInput.value);
+                console.log('After formatting:', formatted);
+                handleInput.value = formatted;
+                console.log('Input field value after setting:', handleInput.value);
+                
+                // Test the input event by dispatching it
+                console.log('Testing input event dispatch...');
+                const inputEvent = new Event('input', { bubbles: true });
+                handleInput.dispatchEvent(inputEvent);
+            }
+            
+            showNotification('Handle formatting test completed. Check console for results.', 'success');
         }
 
         function handleCheckboxChange(checkbox) {
@@ -2065,6 +2354,8 @@
                     
                     keyword.keyword = newValue;
                     renderKeywords();
+                    // Reset generate button since data has changed
+                    resetGenerateButton();
                     showNotification('Keyword updated', 'success');
                 } else {
                     // Restore original if empty or unchanged
@@ -2093,10 +2384,13 @@
                 saveEdit();
             });
             
-            // Click outside to save (redundant with blur, but good for UX)
+            // Click outside to save (only if not already saved by blur)
             const handleClickOutside = (e) => {
                 if (!keywordElement.contains(e.target)) {
-                    saveEdit();
+                    // Only save if the element is still in editing mode
+                    if (keywordElement.classList.contains('editing')) {
+                        saveEdit();
+                    }
                     document.removeEventListener('click', handleClickOutside);
                 }
             };
@@ -2147,6 +2441,8 @@
                 filteredData.push(newH2);
                 
                 renderKeywords();
+                // Reset generate button since data has changed
+                resetGenerateButton();
                 showNotification('New H2 keyword added', 'success');
             }
         }
@@ -2228,6 +2524,8 @@
                 searchKeywords();
                 // Refresh main keyword list
                 renderKeywords();
+                // Reset generate button since data has changed
+                resetGenerateButton();
                 showNotification('Keyword removed successfully', 'success');
             }).catch(error => {
                 console.error('Error updating backend data:', error);
@@ -2238,6 +2536,241 @@
         function clearSearch() {
             document.getElementById('keywordSearch').value = '';
             document.getElementById('searchResults').style.display = 'none';
+        }
+        
+        // Add event listeners to hero section fields to reset generate button when changed
+        document.addEventListener('DOMContentLoaded', function() {
+            const heroFields = ['heroTagline', 'heroCTA', 'heroImageUrl', 'heroAltText'];
+            const identifierFields = ['projectTags']; // Remove projectHandle from here since we handle it separately
+            
+            [...heroFields, ...identifierFields].forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('input', resetGenerateButton);
+                }
+            });
+            
+            // Handle heroCTALink separately since it's now a select element
+            const ctaLinkField = document.getElementById('heroCTALink');
+            if (ctaLinkField) {
+                ctaLinkField.addEventListener('change', resetGenerateButton);
+            }
+            
+            // Add real-time formatting for handle and tags
+            setupRealTimeFormatting();
+            
+            // Setup CTA link dropdown functionality
+            setupCTALinkDropdown();
+            
+            // Test the formatting function
+            console.log('Testing formatHandle function:');
+            console.log('"almond nails" ->', formatHandle('almond nails'));
+            console.log('"ALMOND NAILS" ->', formatHandle('ALMOND NAILS'));
+            console.log('"almond  nails" ->', formatHandle('almond  nails'));
+            console.log('"almond-nails" ->', formatHandle('almond-nails'));
+            
+            // Test space replacement specifically
+            console.log('Testing space replacement:');
+            const testSpace = 'test space';
+            console.log(`"${testSpace}" -> "${testSpace.replace(/\s+/g, '-')}"`);
+            console.log(`"${testSpace}" -> "${formatHandle(testSpace)}"`);
+            
+            // Test trailing space specifically
+            console.log('Testing trailing space:');
+            const testTrailingSpace = 'test ';
+            console.log(`"${testTrailingSpace}" -> "${formatHandle(testTrailingSpace)}"`);
+            
+            // Test space in middle
+            console.log('Testing space in middle:');
+            const testMiddleSpace = 'test space test';
+            console.log(`"${testMiddleSpace}" -> "${formatHandle(testMiddleSpace)}"`);
+        });
+        
+        function setupRealTimeFormatting() {
+            const handleInput = document.getElementById('projectHandle');
+            const tagsInput = document.getElementById('projectTags');
+            
+            console.log('Setting up real-time formatting...');
+            console.log('Handle input found:', !!handleInput);
+            console.log('Tags input found:', !!tagsInput);
+            
+            if (handleInput) {
+                // Primary event listener for real-time formatting
+                handleInput.addEventListener('input', function(e) {
+                    console.log('Handle input event triggered');
+                    const originalValue = e.target.value;
+                    console.log('Original value:', originalValue);
+                    const formattedHandle = formatHandle(originalValue);
+                    console.log('Formatted handle:', formattedHandle);
+                    
+                    // Only update if the formatted value is different to avoid cursor jumping
+                    if (formattedHandle !== originalValue) {
+                        const cursorPosition = e.target.selectionStart;
+                        
+                        e.target.value = formattedHandle;
+                        
+                        // For space-to-hyphen conversion, keep cursor in same position
+                        if (originalValue.includes(' ') && formattedHandle.includes('-')) {
+                            e.target.setSelectionRange(cursorPosition, cursorPosition);
+                        } else {
+                            // For other cases, try to maintain relative position
+                            const newPosition = Math.min(cursorPosition, formattedHandle.length);
+                            e.target.setSelectionRange(newPosition, newPosition);
+                        }
+                        
+                        // Add visual feedback
+                        e.target.style.backgroundColor = '#e8f5e8';
+                        setTimeout(() => {
+                            e.target.style.backgroundColor = '';
+                        }, 200);
+                    }
+                    
+                    // Reset generate button
+                    resetGenerateButton();
+                });
+                
+                // Also format on blur to ensure it happens when user leaves the field
+                handleInput.addEventListener('blur', function(e) {
+                    const originalValue = e.target.value;
+                    const formattedHandle = formatHandle(originalValue);
+                    
+                    if (formattedHandle !== originalValue) {
+                        e.target.value = formattedHandle;
+                        resetGenerateButton();
+                    }
+                });
+            }
+            
+            if (tagsInput) {
+                tagsInput.addEventListener('input', function(e) {
+                    console.log('Tags input event triggered');
+                    // Allow manual editing of tags - no automatic syncing
+                    resetGenerateButton();
+                });
+            }
+        }
+        
+        function formatHandle(value) {
+            console.log('formatHandle called with:', value);
+            if (!value || typeof value !== 'string') {
+                console.log('formatHandle: Invalid input, returning empty string');
+                return '';
+            }
+            
+            // Convert to lowercase and replace spaces with hyphens
+            let formatted = value.toLowerCase();
+            console.log('After toLowerCase:', formatted);
+            
+            // Replace multiple spaces with single hyphen
+            formatted = formatted.replace(/\s+/g, '-');
+            console.log('After space replacement:', formatted);
+            
+            // Remove any characters that aren't letters, numbers, or hyphens
+            formatted = formatted.replace(/[^a-z0-9-]/g, '');
+            console.log('After character filtering:', formatted);
+            
+            // Remove consecutive hyphens
+            formatted = formatted.replace(/-+/g, '-');
+            console.log('After consecutive hyphen removal:', formatted);
+            
+            // Remove leading hyphens but preserve trailing hyphens that result from space conversion
+            formatted = formatted.replace(/^-+/, '');
+            console.log('After leading hyphen removal:', formatted);
+            
+            console.log('formatHandle final result:', formatted);
+            return formatted;
+        }
+        
+        function syncTagsWithHandle(handleValue) {
+            console.log('syncTagsWithHandle called with:', handleValue);
+            const tagsInput = document.getElementById('projectTags');
+            if (!tagsInput || !handleValue) {
+                console.log('Tags input not found or handle value empty');
+                return;
+            }
+            
+            // Convert handle back to space-separated format for tags
+            const tagsValue = handleValue.replace(/-+/g, ' ').trim();
+            console.log('Converted tags value:', tagsValue);
+            
+            // Only update if the current tags value is different
+            if (tagsInput.value !== tagsValue) {
+                console.log('Updating tags input from:', tagsInput.value, 'to:', tagsValue);
+                tagsInput.value = tagsValue;
+            } else {
+                console.log('Tags value unchanged');
+            }
+        }
+        
+        function setupCTALinkDropdown() {
+            const ctaLinkSelect = document.getElementById('heroCTALink');
+            if (!ctaLinkSelect) {
+                console.log('CTA Link select not found');
+                return;
+            }
+            
+            ctaLinkSelect.addEventListener('change', function(e) {
+                const selectedValue = e.target.value;
+                console.log('CTA Link selected:', selectedValue);
+                
+                if (selectedValue === 'custom') {
+                    // Replace the select with a text input for custom URL
+                    const parentDiv = ctaLinkSelect.parentElement;
+                    const label = parentDiv.querySelector('label');
+                    const small = parentDiv.querySelector('small');
+                    
+                    // Create text input
+                    const textInput = document.createElement('input');
+                    textInput.type = 'text';
+                    textInput.className = 'form-control';
+                    textInput.id = 'heroCTALink';
+                    textInput.placeholder = 'Enter custom URL (e.g., https://example.com)';
+                    textInput.required = true;
+                    
+                    // Add event listener to reset generate button
+                    textInput.addEventListener('input', resetGenerateButton);
+                    
+                    // Replace select with input
+                    ctaLinkSelect.replaceWith(textInput);
+                    
+                    // Update help text
+                    if (small) {
+                        small.textContent = 'Enter your custom URL';
+                    }
+                    
+                    // Focus on the new input
+                    textInput.focus();
+                } else if (selectedValue) {
+                    // Reset generate button when a predefined option is selected
+                    resetGenerateButton();
+                }
+            });
+        }
+        
+        function handleGenerateOrDownload() {
+            const generateBtn = document.getElementById('generateBtn');
+            
+            // Check if content has been generated (button is green with "Download" text)
+            if (generateBtn.classList.contains('btn-success') && generateBtn.innerHTML.includes('Download')) {
+                // Download the generated file
+                const filename = generateBtn.dataset.generatedFilename;
+                if (filename) {
+                    downloadGeneratedContent(filename);
+                } else {
+                    showNotification('No generated file found. Please generate content first.', 'error');
+                }
+            } else {
+                // Generate content
+                generateContent();
+            }
+        }
+        
+        function resetGenerateButton() {
+            const generateBtn = document.getElementById('generateBtn');
+            generateBtn.innerHTML = '<i class="fas fa-magic"></i> Generate Content';
+            generateBtn.className = 'btn btn-primary';
+            generateBtn.disabled = false;
+            delete generateBtn.dataset.generatedFilename;
         }
         
         function generateContent() {
@@ -2258,13 +2791,26 @@
             const heroTagline = document.getElementById('heroTagline').value.trim();
             const heroCTA = document.getElementById('heroCTA').value.trim();
             const heroCTALink = document.getElementById('heroCTALink').value.trim();
+            const heroImageUrl = document.getElementById('heroImageUrl').value.trim();
+            const heroAltText = document.getElementById('heroAltText').value.trim();
             
             // Validate hero section data
-            if (!heroTagline || !heroCTA || !heroCTALink) {
-                showNotification('Please fill in all hero section fields (Tagline, CTA Text, and CTA Link)', 'error');
+            if (!heroTagline || !heroCTA || !heroCTALink || !heroImageUrl || !heroAltText) {
+                showNotification('Please fill in all hero section fields (Tagline, CTA Text, CTA Link, Hero Image URL, and Alt Text Image)', 'error');
                 generateBtn.innerHTML = originalText;
                 generateBtn.disabled = false;
                 return;
+            }
+            
+            // Validate that all selected images have been uploaded to Cloudinary
+            if (selectedImages.length > 0) {
+                const unuploadedImages = selectedImages.filter(image => !image.cloudinaryUrl);
+                if (unuploadedImages.length > 0) {
+                    showNotification('You did not upload the images to Cloudinary. Please upload all selected images before generating content.', 'error');
+                    generateBtn.innerHTML = originalText;
+                    generateBtn.disabled = false;
+                    return;
+                }
             }
             
             // Store identifier data for later use in the final output
@@ -2277,8 +2823,32 @@
             const heroData = {
                 tagline: heroTagline,
                 cta_text: heroCTA,
-                cta_link: heroCTALink
+                cta_link: heroCTALink,
+                image_url: heroImageUrl,
+                alt_text: heroAltText
             };
+            
+            // Get handle for consistent image naming
+            const projectHandle = document.getElementById('projectHandle').value.trim();
+            
+            // Get images data (Cloudinary URLs with alt text)
+            const imagesData = selectedImages
+                .filter(image => image.cloudinaryUrl)
+                .map((image, index) => {
+                    // Use handle as filename for all images, with index for uniqueness
+                    let altText = image.filename; // Default fallback
+                    if (projectHandle) {
+                        altText = selectedImages.length > 1 ? `${projectHandle}_${index + 1}` : projectHandle;
+                    }
+                    return {
+                        url: image.cloudinaryUrl,
+                        alt: altText
+                    };
+                });
+            
+            // Debug: Log selected images and images data
+            console.log('Selected Images:', selectedImages);
+            console.log('Images Data being sent:', imagesData);
             
             // First, ensure backend is synced with the data we want to generate content for
             updateBackendData().then(() => {
@@ -2292,12 +2862,21 @@
                         body: JSON.stringify({ 
                             data: filteredData,
                             identifier: identifierData,
-                            hero: heroData
+                            hero: heroData,
+                            images: imagesData
                         })
                     })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
+                            // Change button to green "Download" state
+                            generateBtn.innerHTML = '<i class="fas fa-download"></i> Download';
+                            generateBtn.className = 'btn btn-success';
+                            generateBtn.disabled = false;
+                            
+                            // Store the generated filename for download
+                            generateBtn.dataset.generatedFilename = data.filename;
+                            
                             // Show success message with file location
                             const successMessage = `✅ Content generated successfully! 
 File saved to: D:/articles/nails/${data.filename}`;
@@ -2318,6 +2897,7 @@ File saved to: D:/articles/nails/${data.filename}`;
 • Hero CTA Link: ${summary.hero_cta_link}
 • H2 Sections: ${summary.h2_sections}
 • FAQs Generated: ${summary.faqs_generated}
+• Images Included: ${summary.images_count}
 • File Location: D:/articles/nails/${data.filename}
                             `;
                             showNotification(summaryText, 'success');
@@ -2326,14 +2906,17 @@ File saved to: D:/articles/nails/${data.filename}`;
                             downloadGeneratedContent(data.filename);
                         } else {
                             showNotification('Error generating content: ' + data.error, 'error');
+                            // Reset button state on error
+                            generateBtn.innerHTML = originalText;
+                            generateBtn.className = 'btn btn-primary';
+                            generateBtn.disabled = false;
                         }
                     })
                     .catch(error => {
                         showNotification('Error generating content: ' + error.message, 'error');
-                    })
-                    .finally(() => {
-                        // Reset button state
+                        // Reset button state on error
                         generateBtn.innerHTML = originalText;
+                        generateBtn.className = 'btn btn-primary';
                         generateBtn.disabled = false;
                     });
                 }, 200); // 200ms delay after backend sync
@@ -2403,6 +2986,367 @@ File saved to: D:/articles/nails/${data.filename}`;
                     notification.remove();
                 }
             }, 5000);
+        }
+
+        // Image Upload Functions
+        let selectedImages = [];
+        let pexelsApiKey = 'YOUR_PEXELS_API_KEY'; // Replace with your Pexels API key
+
+        function showUploadOption(option) {
+            // Hide all upload sections
+            document.getElementById('localUploadSection').style.display = 'none';
+            document.getElementById('pexelsSearchSection').style.display = 'none';
+            
+            // Show selected section
+            if (option === 'local') {
+                document.getElementById('localUploadSection').style.display = 'block';
+                // Add event listener for file input
+                document.getElementById('imageFileInput').addEventListener('change', handleLocalImageUpload);
+            } else if (option === 'pexels') {
+                document.getElementById('pexelsSearchSection').style.display = 'block';
+                // Add event listener for Enter key on Pexels search input
+                const pexelsSearchInput = document.getElementById('pexelsSearchInput');
+                if (pexelsSearchInput) {
+                    pexelsSearchInput.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            searchPexels();
+                        }
+                    });
+                }
+            }
+        }
+
+        function handleLocalImageUpload(event) {
+            const files = event.target.files;
+            // Get project handle for consistent naming
+            const projectHandle = document.getElementById('projectHandle').value.trim();
+            
+            for (let file of files) {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const defaultFilename = projectHandle || file.name.replace(/\.[^/.]+$/, ""); // Use handle or original name
+                        const imageData = {
+                            id: Date.now() + Math.random(),
+                            type: 'local',
+                            file: file,
+                            dataUrl: e.target.result,
+                            filename: defaultFilename,
+                            originalName: file.name
+                        };
+                        addSelectedImage(imageData);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        }
+
+        let currentPexelsPage = 1;
+        let currentPexelsQuery = '';
+        let allPexelsImages = [];
+
+        function searchPexels() {
+            const query = document.getElementById('pexelsSearchInput').value.trim();
+            if (!query) {
+                showNotification('Please enter a search term', 'error');
+                return;
+            }
+
+            // Reset pagination for new search
+            currentPexelsPage = 1;
+            currentPexelsQuery = query;
+            allPexelsImages = [];
+
+            const resultsContainer = document.getElementById('pexelsResults');
+            resultsContainer.innerHTML = '<div class="col-12 text-center"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+
+            fetch(`/search_pexels?query=${encodeURIComponent(query)}&page=${currentPexelsPage}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        allPexelsImages = data.images;
+                        displayPexelsResults(allPexelsImages);
+                        
+                        // Show/hide load more button
+                        const loadMoreSection = document.getElementById('loadMoreSection');
+                        if (data.next_page) {
+                            loadMoreSection.style.display = 'block';
+                        } else {
+                            loadMoreSection.style.display = 'none';
+                        }
+                    } else {
+                        showNotification(data.error, 'error');
+                    }
+                })
+                .catch(error => {
+                    showNotification('Error searching Pexels: ' + error.message, 'error');
+                });
+        }
+
+        function loadMorePexels() {
+            if (!currentPexelsQuery) {
+                showNotification('No active search query', 'error');
+                return;
+            }
+
+            currentPexelsPage++;
+            const loadMoreBtn = document.querySelector('#loadMoreSection button');
+            const originalText = loadMoreBtn.innerHTML;
+            loadMoreBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            loadMoreBtn.disabled = true;
+
+            fetch(`/search_pexels?query=${encodeURIComponent(currentPexelsQuery)}&page=${currentPexelsPage}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Add new images to existing ones
+                        allPexelsImages = allPexelsImages.concat(data.images);
+                        displayPexelsResults(allPexelsImages);
+                        
+                        // Show/hide load more button
+                        const loadMoreSection = document.getElementById('loadMoreSection');
+                        if (data.next_page) {
+                            loadMoreSection.style.display = 'block';
+                        } else {
+                            loadMoreSection.style.display = 'none';
+                        }
+                    } else {
+                        showNotification(data.error, 'error');
+                    }
+                })
+                .catch(error => {
+                    showNotification('Error loading more images: ' + error.message, 'error');
+                })
+                .finally(() => {
+                    loadMoreBtn.innerHTML = originalText;
+                    loadMoreBtn.disabled = false;
+                });
+        }
+
+        function displayPexelsResults(images) {
+            const resultsContainer = document.getElementById('pexelsResults');
+            resultsContainer.innerHTML = '';
+
+            if (images.length === 0) {
+                resultsContainer.innerHTML = '<div class="col-12 text-center">No images found</div>';
+                return;
+            }
+
+            images.forEach(image => {
+                const col = document.createElement('div');
+                col.className = 'col-md-3 mb-3';
+                col.innerHTML = `
+                    <div class="pexels-image-card" onclick="selectPexelsImage('${image.id}', '${image.src.large}', '${image.photographer}')">
+                        <div class="image-wrapper">
+                            <img src="${image.src.large}" alt="${image.alt}" loading="lazy">
+                        </div>
+                        <div class="mt-2">
+                            <small class="text-muted">By ${image.photographer}</small>
+                        </div>
+                    </div>
+                `;
+                resultsContainer.appendChild(col);
+            });
+        }
+
+        function selectPexelsImage(imageId, imageUrl, photographer) {
+            // Get project handle for consistent naming
+            const projectHandle = document.getElementById('projectHandle').value.trim();
+            const defaultFilename = projectHandle || `pexels-${imageId}`;
+            
+            const imageData = {
+                id: imageId,
+                type: 'pexels',
+                url: imageUrl,
+                photographer: photographer,
+                filename: defaultFilename,
+                originalName: `${defaultFilename}.jpg`
+            };
+            addSelectedImage(imageData);
+        }
+
+        function addSelectedImage(imageData) {
+            // If this is a handle-based filename, always add an index to make it unique
+            const projectHandle = document.getElementById('projectHandle').value.trim();
+            if (imageData.filename === projectHandle) {
+                const existingImagesWithHandle = selectedImages.filter(img => 
+                    img.filename === projectHandle || img.filename.startsWith(projectHandle + '_')
+                );
+                // Always add an index, starting from 1 for the first image
+                imageData.filename = `${projectHandle}_${existingImagesWithHandle.length + 1}`;
+            }
+            
+            selectedImages.push(imageData);
+            updateSelectedImagesDisplay();
+            document.getElementById('selectedImagesSection').style.display = 'block';
+        }
+
+        function updateSelectedImagesDisplay() {
+            const container = document.getElementById('selectedImagesList');
+            container.innerHTML = '';
+
+            selectedImages.forEach((image, index) => {
+                const col = document.createElement('div');
+                col.className = 'col-md-4 mb-3';
+                
+                const imageSrc = image.type === 'local' ? image.dataUrl : image.url;
+                
+                col.innerHTML = `
+                    <div class="selected-image-item">
+                        <div class="image-wrapper">
+                            <img src="${imageSrc}" alt="Selected image">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Filename:</label>
+                            <input type="text" class="form-control image-filename-input" 
+                                   value="${image.filename}" 
+                                   onchange="updateImageFilename(${index}, this.value)">
+                        </div>
+                        <button class="btn btn-sm btn-danger" onclick="removeSelectedImage(${index})">
+                            <i class="fas fa-trash"></i> Remove
+                        </button>
+                    </div>
+                `;
+                container.appendChild(col);
+            });
+        }
+
+        function updateImageFilename(index, filename) {
+            selectedImages[index].filename = filename;
+        }
+
+        function removeSelectedImage(index) {
+            selectedImages.splice(index, 1);
+            updateSelectedImagesDisplay();
+            
+            if (selectedImages.length === 0) {
+                document.getElementById('selectedImagesSection').style.display = 'none';
+            }
+        }
+
+        function applyBulkFileName() {
+            const bulkFileName = document.getElementById('bulkFileName').value.trim();
+            if (!bulkFileName) {
+                showNotification('Please enter a filename', 'error');
+                return;
+            }
+
+            selectedImages.forEach((image, index) => {
+                image.filename = bulkFileName + (selectedImages.length > 1 ? `-${index + 1}` : '');
+            });
+            updateSelectedImagesDisplay();
+            showNotification('Filename applied to all images', 'success');
+        }
+
+        function uploadToCloudinary() {
+            if (selectedImages.length === 0) {
+                showNotification('No images selected', 'error');
+                return;
+            }
+
+            const uploadPromises = selectedImages.map(image => {
+                return new Promise((resolve, reject) => {
+                    if (image.type === 'local') {
+                        // Upload local file to Cloudinary
+                        uploadLocalImageToCloudinary(image, resolve, reject);
+                    } else {
+                        // Download Pexels image and upload to Cloudinary
+                        uploadPexelsImageToCloudinary(image, resolve, reject);
+                    }
+                });
+            });
+
+            Promise.all(uploadPromises)
+                .then(results => {
+                    showNotification('All images uploaded successfully!', 'success');
+                    console.log('Upload results:', results);
+                })
+                .catch(error => {
+                    showNotification('Error uploading images: ' + error.message, 'error');
+                });
+        }
+
+        function uploadLocalImageToCloudinary(image, resolve, reject) {
+            const formData = new FormData();
+            formData.append('file', image.file);
+            
+            // Use the image.filename which now contains the indexed version
+            const finalFilename = image.filename;
+            formData.append('filename', finalFilename);
+
+            console.log('Uploading to Cloudinary:', image.filename);
+            
+            fetch('/upload_to_cloudinary', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                console.log('Cloudinary upload response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Cloudinary upload response:', data);
+                if (data.success) {
+                    // Set the cloudinaryUrl in the selectedImages array
+                    const imageIndex = selectedImages.findIndex(img => img === image);
+                    if (imageIndex !== -1) {
+                        selectedImages[imageIndex].cloudinaryUrl = data.url;
+                    }
+                    resolve(data.url);
+                } else {
+                    reject(new Error(data.error));
+                }
+            })
+            .catch(error => {
+                console.error('Cloudinary upload error:', error);
+                reject(error);
+            });
+        }
+
+        function uploadPexelsImageToCloudinary(image, resolve, reject) {
+            // Use the image.filename which now contains the indexed version
+            const finalFilename = image.filename;
+            
+            console.log('Uploading Pexels image to Cloudinary:', finalFilename);
+            
+            fetch('/upload_pexels_to_cloudinary', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    imageUrl: image.url,
+                    filename: finalFilename
+                })
+            })
+            .then(response => {
+                console.log('Pexels upload response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Pexels upload response:', data);
+                if (data.success) {
+                    // Set the cloudinaryUrl in the selectedImages array
+                    const imageIndex = selectedImages.findIndex(img => img === image);
+                    if (imageIndex !== -1) {
+                        selectedImages[imageIndex].cloudinaryUrl = data.url;
+                    }
+                    resolve(data.url);
+                } else {
+                    reject(new Error(data.error));
+                }
+            })
+            .catch(error => {
+                console.error('Pexels upload error:', error);
+                reject(error);
+            });
         }
     </script>
 </body>
